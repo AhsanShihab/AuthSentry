@@ -15,7 +15,7 @@ import { useCredentials } from "../../contexts/credentials/provider";
 import { CredentialsActionType } from "../../contexts/credentials/enums";
 import { NOTE_CHARACTER_LIMIT } from "../../constants";
 
-function StoredItem({ item }: { item: ICredentialsData }) {
+function VaultItem({ item }: { item: ICredentialsData }) {
   const [credentials, dispatchCredentials] = useCredentials();
   const [, credentialsDispatch] = useCredentials();
   const [isReadOnly, setIsReadOnly] = useState(true);
@@ -355,4 +355,4 @@ function StoredItem({ item }: { item: ICredentialsData }) {
   );
 }
 
-export default StoredItem;
+export default VaultItem;
