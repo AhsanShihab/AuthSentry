@@ -63,13 +63,9 @@ export class Encryptor {
 
   getStorageKeyForSecret = () => `USER_SECRET_${this.email}`;
 
-  deriveKeyFromPassword = async () => {
+  deriveKeyFromPassword = async (salt: Uint8Array) => {
     const encoder = new TextEncoder();
     const passwordData = encoder.encode(this.getEncryptionKey());
-    const salt = new Uint8Array([
-      0xc0, 0xda, 0xb7, 0xf4, 0x65, 0x46, 0x8b, 0x36, 0x1d, 0x2a, 0xd6, 0x11,
-      0x99, 0x59, 0x88, 0x95,
-    ]);
 
     const keyMaterial = await crypto.subtle.importKey(
       "raw",
@@ -95,7 +91,8 @@ export class Encryptor {
 
   encrypt = async (value: string) => {
     const encoder = new TextEncoder();
-    const keyBytes = await this.deriveKeyFromPassword();
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const keyBytes = await this.deriveKeyFromPassword(salt);
     const key = await crypto.subtle.importKey(
       "raw",
       keyBytes,
@@ -111,15 +108,16 @@ export class Encryptor {
       encoder.encode(value)
     );
     const ivString = uint8ArrayToBase64(iv);
+    const saltString = uint8ArrayToBase64(salt);
     const encryptedDataString = uint8ArrayToBase64(
       new Uint8Array(encryptedData)
     );
 
-    return `${ivString}:${encryptedDataString}`;
+    return `${saltString}:${ivString}:${encryptedDataString}`;
   };
   decrypt = async (value: string) => {
-    const [iv, encryptedData] = value.split(":");
-    const keyBytes = await this.deriveKeyFromPassword();
+    const [salt, iv, encryptedData] = value.split(":");
+    const keyBytes = await this.deriveKeyFromPassword(base64ToUint8Array(salt));
     const key = await crypto.subtle.importKey(
       "raw",
       keyBytes,
