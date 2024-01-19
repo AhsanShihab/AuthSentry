@@ -1,4 +1,3 @@
-import { META_INFO_ENCRYPTION_KEY_HASH_FIELD } from "../constants";
 import { Encryptor } from "./encryption";
 import * as firebase from "./firebase";
 import * as vault from "./vault";
@@ -77,10 +76,6 @@ export const updateMasterPassword = async (
   const email = getCurrentUser()!.email!;
   const newEncryptor = new Encryptor(email, newPassword);
   try {
-    await firebase.updateMetaInfo(
-      META_INFO_ENCRYPTION_KEY_HASH_FIELD,
-      await newEncryptor.getEncryptionKeyHash()
-    );
     await vault.reEncryptData(encryptor, newEncryptor);
     operationStatusCallback("previous", { status: "done" });
   } catch {
@@ -182,10 +177,6 @@ export const updateSecret = async (
   const newEncryptor = new Encryptor(email, password);
   newEncryptor.secret = newSecret;
   try {
-    await firebase.updateMetaInfo(
-      META_INFO_ENCRYPTION_KEY_HASH_FIELD,
-      await newEncryptor.getEncryptionKeyHash()
-    );
     await vault.reEncryptData(currentEncryptor, newEncryptor);
     operationStatusCallback("previous", { status: "done" });
   } catch {

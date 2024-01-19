@@ -116,7 +116,13 @@ export const reEncryptData = async (
     const { id, ...data } = item;
     mappedData[id] = data;
   });
-  await firebase.replaceAllCredentialsWithNewData(mappedData);
+  await Promise.all([
+    firebase.updateMetaInfo(
+      META_INFO_ENCRYPTION_KEY_HASH_FIELD,
+      await newEncryptor.getEncryptionKeyHash()
+    ),
+    firebase.replaceAllCredentialsWithNewData(mappedData),
+  ]);
 };
 
 export const restoreBackup = async () => {
