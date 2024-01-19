@@ -17,6 +17,7 @@ import { getCurrentUser } from "../../services/authentication";
 import { Encryptor } from "../../services/encryption";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
+import { ExclaimationIcon } from "../Common/Icons";
 
 enum SecretAskingCase {
   NOT_SAVED_LOCALLY = 1,
@@ -28,9 +29,9 @@ const SECRET_ASKING_MESSAGE = {
   [SecretAskingCase.NOT_SAVED_LOCALLY]:
     "I don't seem to know your secret. What is it?",
   [SecretAskingCase.NOT_MATCHING_WITH_CLOUD]:
-    "I don't seem to know your latest secret. What's your new secret?",
+    "Looks like you have a new secret. What is it?",
   [SecretAskingCase.NOT_MATCHING_GIVEN_SECRET]:
-    "This doesn't seem to be the corrent secret. What are you forgetting to tell me?",
+    "This doesn't seem to be the latest secret. What are you forgetting to tell me?",
 };
 
 function Authentication() {
@@ -78,7 +79,8 @@ function Authentication() {
       }
 
       encryptor.secret = secret;
-      const isValidEncryptionKey = await vaultService.checkValidityOfEncryptionKey(encryptor);
+      const isValidEncryptionKey =
+        await vaultService.checkValidityOfEncryptionKey(encryptor);
       if (!isValidEncryptionKey) {
         setSecretAskingMessage(
           SECRET_ASKING_MESSAGE[SecretAskingCase.NOT_MATCHING_GIVEN_SECRET]
@@ -161,8 +163,13 @@ function Authentication() {
         <Modal.Body>
           <p>{secretAskingMessage}</p>
           <Form>
+            <Form.Text className="d-block text-warning mb-1">
+              <ExclaimationIcon /> Watch out! This is a plain text input field.
+              Make sure no one is watching!
+            </Form.Text>
             <Form.Control
               type="text"
+              placeholder="Your latest secret"
               value={secret}
               onChange={(e) => setSecret(e.target.value)}
             />
