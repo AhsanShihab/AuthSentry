@@ -17,7 +17,7 @@ import { getCurrentUser } from "../../services/authentication";
 import { Encryptor } from "../../services/encryption";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
-import { ExclaimationIcon } from "../Common/Icons";
+import SecretInput from "../Common/SecretInput";
 
 enum SecretAskingCase {
   NOT_SAVED_LOCALLY = 1,
@@ -163,15 +163,12 @@ function Authentication() {
         <Modal.Body>
           <p>{secretAskingMessage}</p>
           <Form>
-            <Form.Text className="d-block text-warning mb-1">
-              <ExclaimationIcon /> Watch out! This is a plain text input field.
-              Make sure no one is watching!
-            </Form.Text>
-            <Form.Control
-              type="text"
-              placeholder="Your latest secret"
+            <SecretInput
+              className="mb-3"
+              onChange={setSecret}
+              showValidation={false}
               value={secret}
-              onChange={(e) => setSecret(e.target.value)}
+              placeholder="Your latest secret"
             />
           </Form>
         </Modal.Body>

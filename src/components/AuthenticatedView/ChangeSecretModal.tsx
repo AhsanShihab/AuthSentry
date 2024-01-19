@@ -7,6 +7,7 @@ import { CheckIcon, CrossIcon, ExclaimationIcon } from "../Common/Icons";
 import { useCredentials } from "../../contexts/credentials/provider";
 import { CredentialsActionType } from "../../contexts/credentials/enums";
 import { updateSecret } from "../../services/authentication";
+import SecretInput from "../Common/SecretInput";
 
 function ChangeSecretModal({
   show,
@@ -18,6 +19,7 @@ function ChangeSecretModal({
   const [credentials, credentialsDispatch] = useCredentials();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newSecret, setNewSecret] = useState("");
+  const [isSecretReady, setIsSecretReady] = useState(false);
   const [isRunningUpdate, setIsRunningUpdate] = useState(false);
   const [operationStatus, setOperationStatus] = useState<
     { msg: string; status: string }[]
@@ -29,7 +31,7 @@ function ChangeSecretModal({
     setNewSecret("");
     setIsRunningUpdate(false);
     setOperationStatus([]);
-  }
+  };
 
   const handleSecretUpdate = async () => {
     setIsRunningUpdate(true);
@@ -76,7 +78,7 @@ function ChangeSecretModal({
       });
   };
 
-  const isReady = newSecret.length >= 10;
+  const isReady = isSecretReady && Boolean(currentPassword);
 
   return (
     <Modal show={show} size="lg" fullscreen="sm-down">
@@ -92,23 +94,15 @@ function ChangeSecretModal({
               onChange={(e) => setCurrentPassword(e.target.value)}
             />
           </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Tell me a secret</Form.Label>
-            <Form.Text className="d-block text-warning mb-1">
-              <ExclaimationIcon /> Watch out! This is a plain text input field.
-              Make sure no one is watching!
-            </Form.Text>
-            <Form.Control
-              type="text"
-              placeholder="New Secret"
-              value={newSecret}
-              isInvalid={Boolean(newSecret) && newSecret.length < 10}
-              onChange={(e) => setNewSecret(e.target.value)}
-            />
-            <Form.Control.Feedback type="invalid">
-              Need to be at least 10 characters long
-            </Form.Control.Feedback>
-          </Form.Group>
+          <SecretInput
+            className="mb-3 mt-5"
+            label="Tell me your new secret"
+            value={newSecret}
+            placeholder="New Secret"
+            onChange={setNewSecret}
+            showValidation={true}
+            onValidationChange={setIsSecretReady}
+          />
         </Form>
         <div className="mt-2">
           {operationStatus.map((operation, index) => (

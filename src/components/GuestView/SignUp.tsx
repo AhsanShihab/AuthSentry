@@ -4,8 +4,8 @@ import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
 import secureLocalStorage from "react-secure-storage";
 import MasterPasswordRegistrationInput from "../Common/MasterPasswordRegistrationInput";
-import { ExclaimationIcon } from "../Common/Icons";
 import { register } from "../../services/authentication";
+import SecretInput from "../Common/SecretInput";
 
 function SignUp({
   email,
@@ -31,6 +31,7 @@ function SignUp({
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [invalidEmailErrMsg, setInvalidEmailErrMsg] = useState("");
   const [signUpErrorMsg, setSignUpErrorMsg] = useState("");
+  const [isSecretReady, setIsSecretReady] = useState(false);
   const [isProcessingSignUp, setIsProcessingSignUp] = useState(false);
 
   const handleSignup = async () => {
@@ -62,7 +63,6 @@ function SignUp({
 
   const isPasswordReady = Boolean(password) && isPasswordValid;
   const isEmailReady = Boolean(email);
-  const isSecretReady = Boolean(secret) && secret.length >= 10;
   const isReadyForSignUp = isPasswordReady && isEmailReady && isSecretReady;
 
   return (
@@ -93,23 +93,15 @@ function SignUp({
         onChange={setPassword}
         onValidityChange={setIsPasswordValid}
       />
-      <Form.Group className="mb-3">
-        <Form.Label>Tell me a secret</Form.Label>
-        <Form.Text className="d-block text-warning mb-1">
-          <ExclaimationIcon /> Watch out! This is a plain text input field. Make
-          sure no one is watching!
-        </Form.Text>
-        <Form.Control
-          type="text"
-          placeholder="Secret"
-          value={secret}
-          isInvalid={Boolean(secret) && secret.length < 10}
-          onChange={(e) => setSecret(e.target.value)}
-        />
-        <Form.Control.Feedback type="invalid">
-          Need to be at least 10 characters long
-        </Form.Control.Feedback>
-
+      <SecretInput
+        className="mb-3"
+        label="Tell me a secret"
+        placeholder="Secret"
+        value={secret}
+        onChange={setSecret}
+        showValidation={true}
+        onValidationChange={setIsSecretReady}
+      >
         <Form.Text className="text-muted">
           The Secret will be stored locally in a secured way. You won't be asked
           the secret again unless you login from another device or clear your
@@ -126,7 +118,8 @@ function SignUp({
           NOTE that if you forget either your master password or secret, there
           is <strong>NO WAY</strong> to recover your data.
         </Form.Text>
-      </Form.Group>
+      </SecretInput>
+
       {signUpErrorMsg && (
         <p className="text-danger">
           <small>{signUpErrorMsg}</small>
