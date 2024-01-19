@@ -1,4 +1,3 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import {
   getDatabase,
@@ -22,17 +21,31 @@ import {
 } from "firebase/auth";
 import "firebase/firestore";
 import { ICredentialsData } from "../contexts/credentials/types";
+import { META_INFO_ENCRYPTION_KEY_HASH_FIELD } from "../constants";
 
 
-const firebaseConfig = {
-  apiKey: "AIzaSyD79wTgq_sZioGcgtZLRYc6NpXJ44OjHl0",
-  authDomain: "authsentry.firebaseapp.com",
-  databaseURL: "https://authsentry-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "authsentry",
-  storageBucket: "authsentry.appspot.com",
-  messagingSenderId: "181560378156",
-  appId: "1:181560378156:web:ec3705d83b31fc513fe289"
-};
+const firebaseConfig =
+  process.env.NODE_ENV === "production"
+    ? {
+        apiKey: "AIzaSyD79wTgq_sZioGcgtZLRYc6NpXJ44OjHl0",
+        authDomain: "authsentry.firebaseapp.com",
+        databaseURL:
+          "https://authsentry-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "authsentry",
+        storageBucket: "authsentry.appspot.com",
+        messagingSenderId: "181560378156",
+        appId: "1:181560378156:web:ec3705d83b31fc513fe289",
+      }
+    : {
+        apiKey: "AIzaSyDv7o0acOLkjnQsd95TyynnCu-F9oPVUk0",
+        authDomain: "try-firebase-e6e74.firebaseapp.com",
+        databaseURL:
+          "https://try-firebase-e6e74-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "try-firebase-e6e74",
+        storageBucket: "try-firebase-e6e74.appspot.com",
+        messagingSenderId: "524431787845",
+        appId: "1:524431787845:web:da6ac9c08f5afd5f14202c",
+      };
 
 const app = initializeApp(firebaseConfig);
 
@@ -97,7 +110,6 @@ export async function listCredentials() {
 }
 
 export async function createBackup() {
-  // TODO: backup the encryption hash also
   const userId = getCurrentUserId();
   const credList = await listCredentials();
   const formatted: any = {};
@@ -107,12 +119,11 @@ export async function createBackup() {
   });
 
   const db = getDatabase();
-  const credsCollectionRef = ref(db, `users/${userId}/credentials-backup`);
-  await set(credsCollectionRef, formatted);
-
   const metaInfo = await getMetaInfo();
-  const metaInfocollectionRef = ref(db, `users/${userId}/metaInfo-backup`);
-  await set(metaInfocollectionRef, metaInfo);
+  const updates: any = {};
+  updates[`/users/${userId}/metaInfo-backup`] = metaInfo;
+  updates[`/users/${userId}/credentials-backup`] = formatted;
+  await update(ref(db), updates);
 }
 
 export async function restoreBackup() {
@@ -123,15 +134,15 @@ export async function restoreBackup() {
     child(dbRef, `users/${userId}/credentials-backup`)
   );
   const credsBackup = credsBackupSnapshot.val();
-  const credsCollectionRef = ref(db, `users/${userId}/credentials`);
-  await set(credsCollectionRef, credsBackup);
 
   const metaInfoBackupSnapshot = await get(
     child(dbRef, `users/${userId}/metaInfo-backup`)
   );
   const metaInfoBackup = metaInfoBackupSnapshot.val();
-  const metaInfoCollectionRef = ref(db, `users/${userId}/metaInfo`);
-  await set(metaInfoCollectionRef, metaInfoBackup);
+  const updates: any = {};
+  updates[`/users/${userId}/metaInfo`] = metaInfoBackup;
+  updates[`/users/${userId}/credentials`] = credsBackup;
+  await update(ref(db), updates);
 }
 
 export async function deleteBackup() {
@@ -143,11 +154,13 @@ export async function deleteBackup() {
   await remove(metaInfoBackupRef);
 }
 
-export async function replaceAllCredentialsWithNewData(data: any) {
+export async function replaceAllCredentialsWithNewData(data: any, encryptionKeyHash: string) {
   const userId = getCurrentUserId();
   const db = getDatabase();
-  const collectionRef = ref(db, `users/${userId}/credentials`);
-  await set(collectionRef, data);
+  const updates: any = {};
+  updates[`/users/${userId}/credentials`] = data;
+  updates[`/users/${userId}/metaInfo/${META_INFO_ENCRYPTION_KEY_HASH_FIELD}`] = encryptionKeyHash;
+  await update(ref(db), updates);
 }
 
 export async function addCredentials(data: any) {
