@@ -23,6 +23,14 @@ function ChangeSecretModal({
     { msg: string; status: string }[]
   >([]);
 
+  const handleClose = () => {
+    closeModal();
+    setCurrentPassword("");
+    setNewSecret("");
+    setIsRunningUpdate(false);
+    setOperationStatus([]);
+  }
+
   const handleSecretUpdate = async () => {
     setIsRunningUpdate(true);
     setOperationStatus([]);
@@ -134,7 +142,7 @@ function ChangeSecretModal({
           <Button
             className="me-1"
             variant="outline-secondary"
-            onClick={closeModal}
+            onClick={handleClose}
             disabled={isRunningUpdate}
           >
             Close
