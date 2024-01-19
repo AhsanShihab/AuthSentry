@@ -137,3 +137,5 @@ export class Encryptor {
     return new TextDecoder().decode(decryptedData);
   };
 }
+
+export class InvalidEncryptorError extends Error {}

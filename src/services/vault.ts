@@ -3,7 +3,7 @@ import {
   ICredentialsAddData,
   ICredentialsData,
 } from "../contexts/credentials/types";
-import { Encryptor } from "./encryption";
+import { Encryptor, InvalidEncryptorError } from "./encryption";
 import * as firebase from "./firebase";
 
 const decryptData = async (
@@ -49,6 +49,10 @@ export const addCredential = async (
   data: ICredentialsAddData,
   encryptor: Encryptor
 ): Promise<ICredentialsData> => {
+  const isValidEncryptor = await checkValidityOfEncryptionKey(encryptor);
+  if (!isValidEncryptor) {
+    throw new InvalidEncryptorError();
+  }
   const encryptedData = await encryptData(data, encryptor);
   const docReference = await firebase.addCredentials(encryptedData);
 
@@ -60,6 +64,10 @@ export const updateCredentials = async (
   data: ICredentialsAddData,
   encryptor: Encryptor
 ): Promise<void> => {
+  const isValidEncryptor = await checkValidityOfEncryptionKey(encryptor);
+  if (!isValidEncryptor) {
+    throw new InvalidEncryptorError();
+  }
   const encryptedData = await encryptData(data, encryptor);
   await firebase.updateCredentials(docId, encryptedData);
 };
@@ -71,6 +79,10 @@ export const deleteCredentials = async (docId: string): Promise<void> => {
 export const listCredentials = async (
   encryptor: Encryptor
 ): Promise<ICredentialsData[]> => {
+  const isValidEncryptor = await checkValidityOfEncryptionKey(encryptor);
+  if (!isValidEncryptor) {
+    throw new InvalidEncryptorError();
+  }
   const encryptedCredList = await firebase.listCredentials();
   const decryptedListPromise = encryptedCredList.map((data) =>
     decryptData(data, encryptor)
@@ -124,9 +136,7 @@ export const checkValidityOfEncryptionKey = async (
       encryptionKeyHashOnMemory
     );
     return true;
-  } else if (encryptionKeyHashOnMemory === encryptionKeyHashOnCloud) {
-    return true;
   } else {
-    return false;
+    return encryptionKeyHashOnMemory === encryptionKeyHashOnCloud;
   }
 };
