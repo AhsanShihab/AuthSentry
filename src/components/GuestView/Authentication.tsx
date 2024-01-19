@@ -47,15 +47,18 @@ function Authentication() {
     setShowSecretAskModal(false);
     const user = getCurrentUser()!;
     const encryptor = new Encryptor(email, password);
-    if (!encryptor.secret && !secret) {
-      setSecretAskingMessage(
-        SECRET_ASKING_MESSAGE[SecretAskingCase.NOT_SAVED_LOCALLY]
-      );
-      setShowSecretAskModal(true);
-      return;
-    } else if (!encryptor.secret && secret) {
-      encryptor.secret = secret;
+    if (!encryptor.secret) {
+      if (!secret) {
+        setSecretAskingMessage(
+          SECRET_ASKING_MESSAGE[SecretAskingCase.NOT_SAVED_LOCALLY]
+        );
+        setShowSecretAskModal(true);
+        return;
+      } else if (secret) {
+        encryptor.secret = secret;
+      }
     }
+
     const isValidEncryptionKey =
       await vaultService.checkValidityOfEncryptionKey(encryptor);
     if (!isValidEncryptionKey) {
@@ -63,13 +66,26 @@ function Authentication() {
         setSecretAskingMessage(
           SECRET_ASKING_MESSAGE[SecretAskingCase.NOT_MATCHING_WITH_CLOUD]
         );
-      } else {
+        setShowSecretAskModal(true);
+        return;
+      }
+      if (encryptor.secret === secret) {
         setSecretAskingMessage(
           SECRET_ASKING_MESSAGE[SecretAskingCase.NOT_MATCHING_GIVEN_SECRET]
         );
+        setShowSecretAskModal(true);
+        return;
       }
-      setShowSecretAskModal(true);
-      return;
+
+      encryptor.secret = secret;
+      const isValidEncryptionKey = await vaultService.checkValidityOfEncryptionKey(encryptor);
+      if (!isValidEncryptionKey) {
+        setSecretAskingMessage(
+          SECRET_ASKING_MESSAGE[SecretAskingCase.NOT_MATCHING_GIVEN_SECRET]
+        );
+        setShowSecretAskModal(true);
+        return;
+      }
     }
     const credentialsList = await vaultService.listCredentials(encryptor);
     credentialsDispatch({
@@ -112,11 +128,7 @@ function Authentication() {
               <h5> Your Fortress of Security</h5>
             </div>
           </div>
-          <Tabs
-            defaultActiveKey="signin"
-            className="mb-3"
-            fill
-          >
+          <Tabs defaultActiveKey="signin" className="mb-3" fill>
             <Tab eventKey="signin" title="Sign In">
               <SignIn
                 email={email}
