@@ -61,9 +61,6 @@ function StoredItem({ item }: { item: ICredentialsData }) {
       email,
       username,
     };
-
-    // TODO: validate required fields are not empty
-
     await updateCredentials(docId, data, credentials.encryptor!);
     dispatchCredentials({
       type: CredentialsActionType.UPDATE_CREDENTIALS,
@@ -90,12 +87,12 @@ function StoredItem({ item }: { item: ICredentialsData }) {
   };
 
   const isReadyToUpdate =
-  Boolean(name) &&
-  (type === DataType.Credentails
-    ? Boolean(password)
-    : type === DataType.Note
-    ? Boolean(note)
-    : Boolean(password) && Boolean(note));
+    Boolean(name) &&
+    (type === DataType.Credentails
+      ? Boolean(password)
+      : type === DataType.Note
+      ? Boolean(note)
+      : Boolean(password) && Boolean(note));
 
   return (
     <Accordion.Item eventKey={item.id}>
@@ -104,223 +101,223 @@ function StoredItem({ item }: { item: ICredentialsData }) {
         {isReadOnly ? (
           <table className="border-0">
             <tbody>
-            <tr>
-              <td className="pt-2 pe-2 border-0">Type</td>
-              <td className="pt-2 pe-2 border-0">:</td>
-              <td className="pt-2 border-0">{type}</td>
-            </tr>
-
-            {[DataType.Note, DataType.Both].includes(type) && (
               <tr>
-                <td className="pt-2 pe-2 border-0 align-top">Note</td>
-                <td className="pt-2 pe-2 border-0 align-top">:</td>
-                <td
-                  className="pt-2 border-0"
-                  style={{ whiteSpace: "pre-line" }}
-                >
-                  {note}
-                </td>
+                <td className="pt-2 pe-2 border-0">Type</td>
+                <td className="pt-2 pe-2 border-0">:</td>
+                <td className="pt-2 border-0">{type}</td>
               </tr>
-            )}
 
-            {[DataType.Credentails, DataType.Both].includes(type) && (
-              <>
+              {[DataType.Note, DataType.Both].includes(type) && (
                 <tr>
-                  <td className="pt-2 pe-2 border-0">Site Url</td>
-                  <td className="pt-2 pe-2 border-0">:</td>
-                  <td className="pt-2 border-0">
-                    <a href={siteUrl}>{siteUrl}</a>
+                  <td className="pt-2 pe-2 border-0 align-top">Note</td>
+                  <td className="pt-2 pe-2 border-0 align-top">:</td>
+                  <td
+                    className="pt-2 border-0"
+                    style={{ whiteSpace: "pre-line" }}
+                  >
+                    {note}
                   </td>
                 </tr>
-                <tr>
-                  <td className="pt-2 pe-2 border-0">Email</td>
-                  <td className="pt-2 pe-2 border-0">:</td>
-                  <td className="pt-2 border-0">{email}</td>
-                </tr>
-                <tr>
-                  <td className="pt-2 pe-2 border-0">Username</td>
-                  <td className="pt-2 pe-2 border-0">:</td>
-                  <td className="pt-2 border-0">{username}</td>
-                </tr>
-                <tr>
-                  <td className="pt-2 pe-2 border-0">password</td>
-                  <td className="pt-2 pe-2 border-0">:</td>
-                  <td className="pt-2 border-0">
-                    *********{" "}
-                    <Button
-                      className="ms-2 border-0"
-                      variant="outline-secondary"
-                      size="sm"
-                      onClick={handleClickOnPasswordCopy}
-                    >
-                      {copyBtnType === "Copied" ? (
-                        <CheckIcon />
-                      ) : (
-                        <CopyButtonIcon />
-                      )}
-                    </Button>
-                  </td>
-                </tr>
-              </>
-            )}
+              )}
+
+              {[DataType.Credentails, DataType.Both].includes(type) && (
+                <>
+                  <tr>
+                    <td className="pt-2 pe-2 border-0">Site Url</td>
+                    <td className="pt-2 pe-2 border-0">:</td>
+                    <td className="pt-2 border-0">
+                      <a href={siteUrl}>{siteUrl}</a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="pt-2 pe-2 border-0">Email</td>
+                    <td className="pt-2 pe-2 border-0">:</td>
+                    <td className="pt-2 border-0">{email}</td>
+                  </tr>
+                  <tr>
+                    <td className="pt-2 pe-2 border-0">Username</td>
+                    <td className="pt-2 pe-2 border-0">:</td>
+                    <td className="pt-2 border-0">{username}</td>
+                  </tr>
+                  <tr>
+                    <td className="pt-2 pe-2 border-0">password</td>
+                    <td className="pt-2 pe-2 border-0">:</td>
+                    <td className="pt-2 border-0">
+                      *********{" "}
+                      <Button
+                        className="ms-2 border-0"
+                        variant="outline-secondary"
+                        size="sm"
+                        onClick={handleClickOnPasswordCopy}
+                      >
+                        {copyBtnType === "Copied" ? (
+                          <CheckIcon />
+                        ) : (
+                          <CopyButtonIcon />
+                        )}
+                      </Button>
+                    </td>
+                  </tr>
+                </>
+              )}
             </tbody>
           </table>
         ) : (
           <table className="border-0">
             <tbody>
-            <tr>
-              <td className="pe-2 border-0">Name</td>
-              <td className="pe-2 border-0">:</td>
-              <td className="border-0">
-                {" "}
-                <Form.Control
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </td>
-            </tr>
-            <tr>
-              <td className="pe-2 border-0 align-top pt-3">Type</td>
-              <td className="pe-2 border-0 align-top pt-3">:</td>
-              <td className="border-0 pt-3">
-                <Form.Group>
-                  <Form.Check
-                    inline
-                    type="radio"
-                    label={DataType.Credentails}
-                    name="type"
-                    id="type-credentials"
-                    checked={type === DataType.Credentails}
-                    onChange={(e) =>
-                      e.target.checked
-                        ? setType(DataType.Credentails)
-                        : undefined
-                    }
-                  />
-                  <Form.Check
-                    inline
-                    type="radio"
-                    label={DataType.Note}
-                    name="type"
-                    id="type-note"
-                    checked={type === DataType.Note}
-                    onChange={(e) =>
-                      e.target.checked ? setType(DataType.Note) : undefined
-                    }
-                  />
-                  <Form.Check
-                    inline
-                    type="radio"
-                    label={DataType.Both}
-                    name="type"
-                    id="type-both"
-                    checked={type === DataType.Both}
-                    onChange={(e) =>
-                      e.target.checked ? setType(DataType.Both) : undefined
-                    }
-                  />
-                </Form.Group>
-              </td>
-            </tr>
-
-            {[DataType.Note, DataType.Both].includes(type) && (
               <tr>
-                <td className="pt-3 pe-2 border-0 align-top">Note</td>
-                <td className="pt-3 pe-2 border-0 align-top">:</td>
-                <td className="pt-3 border-0 w-100">
+                <td className="pe-2 border-0">Name</td>
+                <td className="pe-2 border-0">:</td>
+                <td className="border-0">
+                  {" "}
                   <Form.Control
-                    as="textarea"
-                    rows={5}
-                    onChange={(e) => handleNote(e.target.value)}
-                    value={note}
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
                   />
                 </td>
               </tr>
-            )}
-            {[DataType.Credentails, DataType.Both].includes(type) && (
-              <>
-                <tr>
-                  <td className="pt-3 pe-2 border-0">Site Url</td>
-                  <td className="pt-3 pe-2 border-0">:</td>
-                  <td className="pt-3 border-0">
-                    <Form.Control
-                      type="text"
-                      value={siteUrl}
-                      onChange={(e) => setSiteUrl(e.target.value)}
-                    />
-                  </td>
-                </tr>
-                <tr>
-                  <td className="pt-3 pe-2 border-0">Email</td>
-                  <td className="pt-3 pe-2 border-0">:</td>
-                  <td className="pt-3 border-0">
-                    <Form.Control
-                      type="text"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
-                  </td>
-                </tr>
-                <tr>
-                  <td className="pt-3 pe-2 border-0">Username</td>
-                  <td className="pt-3 pe-2 border-0">:</td>
-                  <td className="pt-3 border-0">
-                    <Form.Control
-                      type="text"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                    />
-                  </td>
-                </tr>
-                <tr>
-                  <td className="pt-3 pe-2 border-0 align-top">Password</td>
-                  <td className="pt-3 pe-2 border-0 align-top">:</td>
-                  <td className="pt-3 border-0">
-                    <Form.Control
-                      className="d-inline w-75"
-                      type="password"
-                      placeholder="mysupersecurepass"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />{" "}
-                    <Button
-                      className="ms-2 border-0"
-                      variant="outline-secondary"
-                      size="sm"
-                      onClick={handleClickOnPasswordCopy}
-                    >
-                      {copyBtnType === "Copied" ? (
-                        <CheckIcon />
-                      ) : (
-                        <CopyButtonIcon />
-                      )}
-                    </Button>
-                  </td>
-                </tr>
-                <tr>
-                  <td className="pt-3 pe-2 border-0 align-top"></td>
-                  <td className="pt-3 pe-2 border-0 align-top"></td>
-                  <td className="pt-3 border-0">
-                    <p
-                      className={
-                        passwordLength < 20 ? "text-danger" : "text-muted"
+              <tr>
+                <td className="pe-2 border-0 align-top pt-3">Type</td>
+                <td className="pe-2 border-0 align-top pt-3">:</td>
+                <td className="border-0 pt-3">
+                  <Form.Group>
+                    <Form.Check
+                      inline
+                      type="radio"
+                      label={DataType.Credentails}
+                      name="type"
+                      id="type-credentials"
+                      checked={type === DataType.Credentails}
+                      onChange={(e) =>
+                        e.target.checked
+                          ? setType(DataType.Credentails)
+                          : undefined
                       }
-                    >
-                      Password Length: {passwordLength}{" "}
-                    </p>
+                    />
+                    <Form.Check
+                      inline
+                      type="radio"
+                      label={DataType.Note}
+                      name="type"
+                      id="type-note"
+                      checked={type === DataType.Note}
+                      onChange={(e) =>
+                        e.target.checked ? setType(DataType.Note) : undefined
+                      }
+                    />
+                    <Form.Check
+                      inline
+                      type="radio"
+                      label={DataType.Both}
+                      name="type"
+                      id="type-both"
+                      checked={type === DataType.Both}
+                      onChange={(e) =>
+                        e.target.checked ? setType(DataType.Both) : undefined
+                      }
+                    />
+                  </Form.Group>
+                </td>
+              </tr>
 
-                    <Form.Range
-                      className="d-inline w-75"
-                      min="8"
-                      max="256"
-                      onChange={(e) => changePasswordLength(e.target.value)}
-                      value={passwordLength}
+              {[DataType.Note, DataType.Both].includes(type) && (
+                <tr>
+                  <td className="pt-3 pe-2 border-0 align-top">Note</td>
+                  <td className="pt-3 pe-2 border-0 align-top">:</td>
+                  <td className="pt-3 border-0 w-100">
+                    <Form.Control
+                      as="textarea"
+                      rows={5}
+                      onChange={(e) => handleNote(e.target.value)}
+                      value={note}
                     />
                   </td>
                 </tr>
-              </>
-            )}
+              )}
+              {[DataType.Credentails, DataType.Both].includes(type) && (
+                <>
+                  <tr>
+                    <td className="pt-3 pe-2 border-0">Site Url</td>
+                    <td className="pt-3 pe-2 border-0">:</td>
+                    <td className="pt-3 border-0">
+                      <Form.Control
+                        type="text"
+                        value={siteUrl}
+                        onChange={(e) => setSiteUrl(e.target.value)}
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="pt-3 pe-2 border-0">Email</td>
+                    <td className="pt-3 pe-2 border-0">:</td>
+                    <td className="pt-3 border-0">
+                      <Form.Control
+                        type="text"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="pt-3 pe-2 border-0">Username</td>
+                    <td className="pt-3 pe-2 border-0">:</td>
+                    <td className="pt-3 border-0">
+                      <Form.Control
+                        type="text"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="pt-3 pe-2 border-0 align-top">Password</td>
+                    <td className="pt-3 pe-2 border-0 align-top">:</td>
+                    <td className="pt-3 border-0">
+                      <Form.Control
+                        className="d-inline w-75"
+                        type="password"
+                        placeholder="mysupersecurepass"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />{" "}
+                      <Button
+                        className="ms-2 border-0"
+                        variant="outline-secondary"
+                        size="sm"
+                        onClick={handleClickOnPasswordCopy}
+                      >
+                        {copyBtnType === "Copied" ? (
+                          <CheckIcon />
+                        ) : (
+                          <CopyButtonIcon />
+                        )}
+                      </Button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="pt-3 pe-2 border-0 align-top"></td>
+                    <td className="pt-3 pe-2 border-0 align-top"></td>
+                    <td className="pt-3 border-0">
+                      <p
+                        className={
+                          passwordLength < 20 ? "text-danger" : "text-muted"
+                        }
+                      >
+                        Password Length: {passwordLength}{" "}
+                      </p>
+
+                      <Form.Range
+                        className="d-inline w-75"
+                        min="8"
+                        max="256"
+                        onChange={(e) => changePasswordLength(e.target.value)}
+                        value={passwordLength}
+                      />
+                    </td>
+                  </tr>
+                </>
+              )}
             </tbody>
           </table>
         )}
