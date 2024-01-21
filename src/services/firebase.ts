@@ -22,30 +22,14 @@ import {
 import "firebase/firestore";
 import { ICredentialsData } from "../contexts/credentials/types";
 import { META_INFO_ENCRYPTION_KEY_HASH_FIELD } from "../constants";
+import firebaseConfigDev from "../config/firebase_config_dev.json";
+import firebaseConfigProd from "../config/firebase_config_prod.json";
 
 
 const firebaseConfig =
   process.env.NODE_ENV === "production"
-    ? {
-        apiKey: "AIzaSyD79wTgq_sZioGcgtZLRYc6NpXJ44OjHl0",
-        authDomain: "authsentry.firebaseapp.com",
-        databaseURL:
-          "https://authsentry-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "authsentry",
-        storageBucket: "authsentry.appspot.com",
-        messagingSenderId: "181560378156",
-        appId: "1:181560378156:web:ec3705d83b31fc513fe289",
-      }
-    : {
-        apiKey: "AIzaSyDv7o0acOLkjnQsd95TyynnCu-F9oPVUk0",
-        authDomain: "try-firebase-e6e74.firebaseapp.com",
-        databaseURL:
-          "https://try-firebase-e6e74-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "try-firebase-e6e74",
-        storageBucket: "try-firebase-e6e74.appspot.com",
-        messagingSenderId: "524431787845",
-        appId: "1:524431787845:web:da6ac9c08f5afd5f14202c",
-      };
+    ? firebaseConfigProd
+    : firebaseConfigDev;
 
 const app = initializeApp(firebaseConfig);
 
