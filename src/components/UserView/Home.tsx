@@ -19,7 +19,7 @@ import { useAuth } from "../../contexts/auth/provider";
 import { CredentialsActionType } from "../../contexts/credentials/enums";
 import { AuthActionType } from "../../contexts/auth/enums";
 import { AUTO_LOGOUT_TIMEOUT_SECONDS } from "../../constants";
-import AddPassword from "./AddPassword";
+import AddPasswordModal from "./AddPasswordModal";
 import DownloadModal from "./DownloadModal";
 import ChangeMasterPasswordModal from "./ChangeMasterPasswordModal";
 import ChangeSecretModal from "./ChangeSecretModal";
@@ -191,7 +191,7 @@ function Home() {
           </Row>
 
           <VaultItemList />
-          <AddPassword
+          <AddPasswordModal
             isOpen={showAddNewModal}
             hideModal={hidePasswordAddModal}
           />

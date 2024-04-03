@@ -14,6 +14,9 @@ function VaultItemList() {
   const filteredCredentialsList = credentials.credentials.filter((item) =>
     item.name.toLowerCase().includes(searchString.toLowerCase())
   );
+
+  filteredCredentialsList.sort((a, b) => a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1);
+
   return (
     <>
       <Row className="mt-3">

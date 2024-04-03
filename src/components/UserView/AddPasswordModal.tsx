@@ -16,7 +16,7 @@ import { generateRandomPassword } from "../../services/password_generator";
 import * as vaultService from "../../services/vault";
 import { NOTE_CHARACTER_LIMIT } from "../../constants";
 
-function AddPassword({
+function AddPasswordModal({
   isOpen,
   hideModal,
 }: {
@@ -284,4 +284,4 @@ function AddPassword({
   );
 }
 
-export default AddPassword;
+export default AddPasswordModal;

@@ -1,5 +1,5 @@
 import Authentication from "./GuestView/Authentication";
-import Home from "./AuthenticatedView/Home";
+import Home from "./UserView/Home";
 import { useAuth } from "../contexts/auth/provider";
 
 function Main() {
