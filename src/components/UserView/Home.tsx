@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -18,24 +18,21 @@ import { useCredentials } from "../../contexts/credentials/provider";
 import { useAuth } from "../../contexts/auth/provider";
 import { CredentialsActionType } from "../../contexts/credentials/enums";
 import { AuthActionType } from "../../contexts/auth/enums";
-import { AUTO_LOGOUT_TIMEOUT_SECONDS } from "../../constants";
 import AddPasswordModal from "./AddPasswordModal";
 import DownloadModal from "./DownloadModal";
 import ChangeMasterPasswordModal from "./ChangeMasterPasswordModal";
 import ChangeSecretModal from "./ChangeSecretModal";
 import VaultItemList from "./VaultItemList";
+import LogoutCountdownTime from "./LogoutCountdownTime";
 
 function Home() {
-  const [authState, authStateDispatch] = useAuth();
+  const [, authStateDispatch] = useAuth();
   const [credentials, credentialsDispatch] = useCredentials();
   const [showAddNewModal, setShowAddNewModal] = useState(false);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [showMasterPasswordUpdateModal, setShowMasterPasswordUpdateModal] =
     useState(false);
   const [showSecretChangeModal, setShowSecretChangeModal] = useState(false);
-  const [remainingSeconds, setRemainingSeconds] = useState(
-    AUTO_LOGOUT_TIMEOUT_SECONDS
-  );
 
   const refreshList = async () => {
     const encryptor = credentials.encryptor!;
@@ -82,38 +79,6 @@ function Home() {
 
   const hidePasswordAddModal = () => setShowAddNewModal(false);
 
-  const getFormattedTime = () => {
-    let time = "";
-    const minutes = Math.floor(remainingSeconds / 60);
-    const seconds = Math.floor(remainingSeconds % 60);
-    if (minutes <= 9) {
-      time += "0";
-    }
-    time += minutes.toString() + ":";
-    if (seconds <= 9) {
-      time += "0";
-    }
-    time += seconds.toString();
-
-    return time;
-  };
-
-  useEffect(() => {
-    const reset = setInterval(() => {
-      const signInTime = authState.loggedInTime;
-      const currentTime = Date.now();
-      const elapsedTime = currentTime - signInTime;
-      const remains = AUTO_LOGOUT_TIMEOUT_SECONDS * 1000 - elapsedTime;
-      const remainingSecondss = Math.max(remains / 1000, 0);
-      if (remainingSecondss === 0) {
-        signOut();
-      }
-      setRemainingSeconds(remainingSecondss);
-    }, 1000);
-
-    return () => clearInterval(reset);
-  }, [authState.loggedInTime, signOut]);
-
   return (
     <Container className="pb-5">
       <Row className="mt-3">
@@ -127,15 +92,7 @@ function Home() {
           </div>
           <Row>
             <Col>
-              <p>
-                <small className="text-muted mb-0">
-                  Automatic logout in: {getFormattedTime()}
-                </small>
-                <br />
-                <small className="text-muted mt-0">
-                  You will be logged out if you reload or close this window.
-                </small>
-              </p>
+              <LogoutCountdownTime />
             </Col>
           </Row>
           <Row>
