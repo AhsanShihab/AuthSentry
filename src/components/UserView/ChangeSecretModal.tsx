@@ -4,8 +4,8 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
 import { CheckIcon, CrossIcon, ExclaimationIcon } from "../Common/Icons";
-import { useCredentials } from "../../contexts/credentials/provider";
-import { CredentialsActionType } from "../../contexts/credentials/enums";
+import { useCredentials } from "../../contexts/vault/provider";
+import { CredentialsActionType } from "../../contexts/vault/enums";
 import { updateSecret } from "../../services/authentication";
 import SecretInput from "../Common/SecretInput";
 

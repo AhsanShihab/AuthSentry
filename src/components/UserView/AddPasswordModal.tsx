@@ -6,12 +6,12 @@ import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import { CheckIcon, CopyButtonIcon } from "../Common/Icons";
-import { useCredentials } from "../../contexts/credentials/provider";
+import { useCredentials } from "../../contexts/vault/provider";
 import {
   DataType,
   ICredentialsAddData,
-} from "../../contexts/credentials/types";
-import { CredentialsActionType } from "../../contexts/credentials/enums";
+} from "../../contexts/vault/types";
+import { CredentialsActionType } from "../../contexts/vault/enums";
 import { generateRandomPassword } from "../../services/password_generator";
 import * as vaultService from "../../services/vault";
 import { NOTE_CHARACTER_LIMIT } from "../../constants";
@@ -84,7 +84,6 @@ function AddPasswordModal({
         ? password
         : "",
     };
-    // TODO: check encryption key validity
     const data = await vaultService.addCredential(
       submitData,
       credentials.encryptor!

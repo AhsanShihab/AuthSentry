@@ -14,9 +14,9 @@ import {
   SecretIcon,
   VerticalElipsisIcon,
 } from "../Common/Icons";
-import { useCredentials } from "../../contexts/credentials/provider";
+import { useCredentials } from "../../contexts/vault/provider";
 import { useAuth } from "../../contexts/auth/provider";
-import { CredentialsActionType } from "../../contexts/credentials/enums";
+import { CredentialsActionType } from "../../contexts/vault/enums";
 import { AuthActionType } from "../../contexts/auth/enums";
 import AddPasswordModal from "./AddPasswordModal";
 import DownloadModal from "./DownloadModal";
@@ -24,6 +24,7 @@ import ChangeMasterPasswordModal from "./ChangeMasterPasswordModal";
 import ChangeSecretModal from "./ChangeSecretModal";
 import VaultItemList from "./VaultItemList";
 import LogoutCountdownTime from "./LogoutCountdownTime";
+import VaultLoader from "./VaultLoader";
 
 function Home() {
   const [, authStateDispatch] = useAuth();
@@ -166,6 +167,7 @@ function Home() {
           />
         </Col>
       </Row>
+      <VaultLoader />
     </Container>
   );
 }

@@ -2,32 +2,29 @@ import { useState } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
-import secureLocalStorage from "react-secure-storage";
 import MasterPasswordRegistrationInput from "../Common/MasterPasswordRegistrationInput";
 import { register } from "../../services/authentication";
 import SecretInput from "../Common/SecretInput";
+import { Encryptor } from "../../services/encryption";
 
 function SignUp({
   email,
   password,
-  secret,
   isAuthenticating,
   setEmail,
   setPassword,
-  setSecret,
   setIsAuthenticating,
   onSignUp,
 }: {
   email: string;
   password: string;
-  secret: string;
   isAuthenticating: boolean;
   setEmail: React.Dispatch<React.SetStateAction<string>>;
   setPassword: React.Dispatch<React.SetStateAction<string>>;
-  setSecret: React.Dispatch<React.SetStateAction<string>>;
   setIsAuthenticating: React.Dispatch<React.SetStateAction<boolean>>;
   onSignUp: () => Promise<void>;
 }) {
+  const [secret, setSecret] = useState("");
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [invalidEmailErrMsg, setInvalidEmailErrMsg] = useState("");
   const [signUpErrorMsg, setSignUpErrorMsg] = useState("");
@@ -41,7 +38,7 @@ function SignUp({
     setSignUpErrorMsg("");
     try {
       await register(email, password);
-      secureLocalStorage.setItem("last_logged_in_email", email);
+      new Encryptor(email, password).secret = secret;
       await onSignUp();
     } catch (err: any) {
       if (err.code === "auth/invalid-email") {
@@ -79,9 +76,6 @@ function SignUp({
         <Form.Control.Feedback type="invalid">
           {invalidEmailErrMsg}
         </Form.Control.Feedback>
-        <Form.Text className="text-muted">
-          We'll never share your email with anyone else.
-        </Form.Text>
       </Form.Group>
       <MasterPasswordRegistrationInput
         className="mb-3"

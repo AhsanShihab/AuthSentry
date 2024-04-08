@@ -6,6 +6,7 @@ export interface IAuthState {
     userInfo: {
       uid: string;
       email: string;
+      password: string;
     };
   } | null;
   loggedInTime: number;

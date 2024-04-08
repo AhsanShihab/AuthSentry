@@ -2,7 +2,7 @@ import { META_INFO_ENCRYPTION_KEY_HASH_FIELD } from "../constants";
 import {
   ICredentialsAddData,
   ICredentialsData,
-} from "../contexts/credentials/types";
+} from "../contexts/vault/types";
 import { Encryptor, InvalidEncryptorError } from "./encryption";
 import * as firebase from "./firebase";
 

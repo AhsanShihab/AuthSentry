@@ -1,10 +1,11 @@
-import Authentication from "./GuestView/Authentication";
-import Home from "./UserView/Home";
-import { useAuth } from "../contexts/auth/provider";
-import { usePWAContext } from "../contexts/pwa/provider";
+import { useState } from "react";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
-import { useState } from "react";
+import Authentication from "./GuestView/Authentication";
+import Home from "./UserView/Home";
+import { CredentialsContextProvider } from "../contexts/vault/provider";
+import { useAuth } from "../contexts/auth/provider";
+import { usePWAContext } from "../contexts/pwa/provider";
 
 function Main() {
   const [authState] = useAuth();
@@ -14,9 +15,15 @@ function Main() {
   return (
     <div>
       {!isInstalled && showInstallMessage && (
-        <Alert variant="primary d-block d-md-flex justify-content-center align-items-center gap-1 rounded-0" dismissible onClose={() => setShowInstallMessage(false)}>
+        <Alert
+          variant="primary d-block d-md-flex justify-content-center align-items-center gap-1 rounded-0"
+          dismissible
+          onClose={() => setShowInstallMessage(false)}
+        >
           You can install AuthSentry on your device for easier access.{" "}
-          <Button variant="outline-secondary" onClick={install}>Install App</Button>
+          <Button variant="outline-secondary" onClick={install}>
+            Install App
+          </Button>
         </Alert>
       )}
       {authState.isLoading ? (
@@ -24,7 +31,9 @@ function Main() {
           <h1 className="display-1">AuthSentry</h1>
         </div>
       ) : authState.user ? (
-        <Home />
+        <CredentialsContextProvider>
+          <Home />
+        </CredentialsContextProvider>
       ) : (
         <Authentication />
       )}

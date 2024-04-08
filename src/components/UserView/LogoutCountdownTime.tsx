@@ -2,8 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import { AUTO_LOGOUT_TIMEOUT_SECONDS } from "../../constants";
 import { useAuth } from "../../contexts/auth/provider";
 import { logOut } from "../../services/firebase";
-import { useCredentials } from "../../contexts/credentials/provider";
-import { CredentialsActionType } from "../../contexts/credentials/enums";
+import { useCredentials } from "../../contexts/vault/provider";
+import { CredentialsActionType } from "../../contexts/vault/enums";
 import { AuthActionType } from "../../contexts/auth/enums";
 
 function LogoutCountdownTime() {

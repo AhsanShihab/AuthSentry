@@ -5,8 +5,8 @@ import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
 import MasterPasswordRegistrationInput from "../Common/MasterPasswordRegistrationInput";
 import { CheckIcon, CrossIcon, ExclaimationIcon } from "../Common/Icons";
-import { useCredentials } from "../../contexts/credentials/provider";
-import { CredentialsActionType } from "../../contexts/credentials/enums";
+import { useCredentials } from "../../contexts/vault/provider";
+import { CredentialsActionType } from "../../contexts/vault/enums";
 import { updateMasterPassword } from "../../services/authentication";
 
 function ChangeMasterPasswordModal({

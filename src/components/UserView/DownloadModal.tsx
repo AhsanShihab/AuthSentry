@@ -3,11 +3,11 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import { useCredentials } from "../../contexts/credentials/provider";
+import { useCredentials } from "../../contexts/vault/provider";
 import * as vault from "../../services/vault";
 import * as authentication from "../../services/authentication";
 import { useState } from "react";
-import { DataType } from "../../contexts/credentials/types";
+import { DataType } from "../../contexts/vault/types";
 
 function DownloadModal({
   show,

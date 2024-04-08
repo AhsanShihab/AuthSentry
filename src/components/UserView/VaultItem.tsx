@@ -10,9 +10,9 @@ import {
   DataType,
   ICredentialsAddData,
   ICredentialsData,
-} from "../../contexts/credentials/types";
-import { useCredentials } from "../../contexts/credentials/provider";
-import { CredentialsActionType } from "../../contexts/credentials/enums";
+} from "../../contexts/vault/types";
+import { useCredentials } from "../../contexts/vault/provider";
+import { CredentialsActionType } from "../../contexts/vault/enums";
 import { NOTE_CHARACTER_LIMIT } from "../../constants";
 
 function VaultItem({ item }: { item: ICredentialsData }) {

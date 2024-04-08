@@ -7,7 +7,7 @@ A:  I initially did use the SDK. But then I noticed the app got injected with so
 */
 
 import axios, { AxiosError } from "axios";
-import { ICredentialsData } from "../contexts/credentials/types";
+import { ICredentialsData } from "../contexts/vault/types";
 import { META_INFO_ENCRYPTION_KEY_HASH_FIELD } from "../constants";
 import firebaseConfigDev from "../config/firebase_config_dev.json";
 import firebaseConfigProd from "../config/firebase_config_prod.json";
@@ -34,6 +34,7 @@ const apiKey = firebaseConfig.apiKey;
 const databaseURL = firebaseConfig.databaseURL;
 
 let currentUserEmail: string | null = null;
+let currentUserPassword: string | null = null;
 let currentIdToken: string | null = null;
 let currentRefreshToken: string | null = null;
 let currentUserId: string | null = null;
@@ -62,6 +63,7 @@ export const getCurrentUser = () => {
   return {
     uid: currentUserId,
     email: currentUserEmail!,
+    password: currentUserPassword!,
   };
 };
 
@@ -80,6 +82,8 @@ export async function signUp(email: string, password: string) {
     currentIdToken = idToken;
     currentRefreshToken = refreshToken;
     currentUserId = userId;
+    currentUserEmail = email;
+    currentUserPassword = password;
   } catch (err) {
     if (err instanceof AxiosError) {
       throwFirebaseStyleError(err);
@@ -105,6 +109,7 @@ export async function logIn(email: string, password: string) {
     currentIdToken = idToken;
     currentRefreshToken = refreshToken;
     currentUserId = userId;
+    currentUserPassword = password;
   } catch (err) {
     if (err instanceof AxiosError) {
       throwFirebaseStyleError(err);
@@ -119,6 +124,7 @@ export async function logOut() {
   currentRefreshToken = null;
   currentUserId = null;
   currentUserEmail = null;
+  currentUserPassword = null;
 }
 
 export async function verifyPassword(password: string) {
@@ -138,6 +144,7 @@ export async function updateMasterPassword(newPassword: string) {
   const { idToken, refreshToken } = res.data;
   currentIdToken = idToken;
   currentRefreshToken = refreshToken;
+  currentUserPassword = newPassword;
 }
 
 function getCurrentUserId() {

@@ -5,7 +5,7 @@ import Form from "react-bootstrap/Form";
 import Accordion from "react-bootstrap/Accordion";
 import Placeholder from "react-bootstrap/Placeholder";
 import { VaultIcon } from "../Common/Icons";
-import { useCredentials } from "../../contexts/credentials/provider";
+import { useCredentials } from "../../contexts/vault/provider";
 import VaultItem from "./VaultItem";
 
 function VaultItemList() {

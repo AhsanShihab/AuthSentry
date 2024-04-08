@@ -2,7 +2,6 @@ import { useState } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
-import secureLocalStorage from "react-secure-storage";
 import { logIn } from "../../services/authentication";
 
 function SignIn({
@@ -33,7 +32,6 @@ function SignIn({
     setInvalidEmailErrMsg("");
     try {
       await logIn(email, password);
-      secureLocalStorage.setItem("last_logged_in_email", email);
       await onSignIn();
     } catch (err: any) {
       if (err.code === "auth/invalid-email") {
