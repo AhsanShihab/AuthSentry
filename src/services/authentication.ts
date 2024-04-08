@@ -15,7 +15,7 @@ export const register = async (email: string, password: string) => {
 };
 
 export const getCurrentUser = () => {
-  return firebase.auth.currentUser;
+  return firebase.getCurrentUser();
 };
 
 export const verifyPassword = async (password: string) => {

@@ -1,9 +1,13 @@
-import { User } from "firebase/auth";
 import { AuthActionType } from "./enums";
 
 export interface IAuthState {
   isLoading: boolean;
-  user: { userInfo: User } | null;
+  user: {
+    userInfo: {
+      uid: string;
+      email: string;
+    };
+  } | null;
   loggedInTime: number;
 }
 
