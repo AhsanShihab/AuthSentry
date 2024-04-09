@@ -6,8 +6,9 @@ import SecretInput from "../Common/SecretInput";
 import { useAuth } from "../../contexts/auth/provider";
 import { Encryptor, InvalidEncryptorError } from "../../services/encryption";
 import * as vaultService from "../../services/vault";
-import { useCredentials } from "../../contexts/vault/provider";
-import { CredentialsActionType } from "../../contexts/vault/enums";
+import { useVault } from "../../contexts/vault/provider";
+import { VaultActionType } from "../../contexts/vault/enums";
+import { migrateDatabaseFromCredentialsToVault } from "../../services/firebase";
 
 enum SecretAskingCase {
   NOT_SAVED_LOCALLY = 1,
@@ -26,7 +27,7 @@ const SECRET_ASKING_MESSAGE = {
 
 function VaultLoader() {
   const [auth] = useAuth();
-  const [, credentialsDispatch] = useCredentials();
+  const [, vaultDispatch] = useVault();
   const [showSecretAskModal, setShowSecretAskModal] = useState(false);
   const [secretAskingMessage, setSecretAskingMessage] = useState("");
   const [secret, setSecret] = useState("");
@@ -48,11 +49,12 @@ function VaultLoader() {
     }
 
     try {
-      const credentialsList = await vaultService.listCredentials(encryptor);
-      credentialsDispatch({
-        type: CredentialsActionType.LOAD_CREDENTIALS,
+      await migrateDatabaseFromCredentialsToVault();
+      const vaultItemList = await vaultService.listVaultItems(encryptor);
+      vaultDispatch({
+        type: VaultActionType.LOAD_VAULT,
         payload: {
-          credentials: credentialsList,
+          items: vaultItemList,
           isLoading: false,
           encryptor: encryptor,
         },

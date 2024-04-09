@@ -1,32 +1,32 @@
 import React, { useContext, useReducer } from "react";
-import { credentialsReducer } from "./reducer";
-import { CredentialsContext } from "./context";
-import { ICredentialsState } from "./types";
+import { vaultReducer } from "./reducer";
+import { VaultContext } from "./context";
+import { IVaultState } from "./types";
 
-const initialState: ICredentialsState = {
+const initialState: IVaultState = {
   isLoading: true,
   encryptor: undefined,
-  credentials: [],
+  items: [],
 };
 
-export function CredentialsContextProvider({
+export function VaultContextProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [credentials, dispatch] = useReducer(credentialsReducer, initialState);
+  const [vault, dispatch] = useReducer(vaultReducer, initialState);
 
   return (
-    <CredentialsContext.Provider value={[credentials, dispatch]}>
+    <VaultContext.Provider value={[vault, dispatch]}>
       {children}
-    </CredentialsContext.Provider>
+    </VaultContext.Provider>
   );
 }
 
-export function useCredentials() {
-  const context = useContext(CredentialsContext);
+export function useVault() {
+  const context = useContext(VaultContext);
   if (!context) {
-    throw new Error("Credentials context is not available on this component");
+    throw new Error("Vault context is not available on this component");
   }
   return context;
 }

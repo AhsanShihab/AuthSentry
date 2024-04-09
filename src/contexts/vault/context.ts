@@ -1,11 +1,11 @@
 import { createContext } from "react";
-import { ICredentialsAction, ICredentialsState } from "./types";
+import { IVaultAction, IVaultState } from "./types";
 
-type CredentialsContextType = [
-  ICredentialsState,
-  React.Dispatch<ICredentialsAction>
+type VaultContextType = [
+  IVaultState,
+  React.Dispatch<IVaultAction>
 ];
 
-export const CredentialsContext = createContext<CredentialsContextType | null>(
+export const VaultContext = createContext<VaultContextType | null>(
   null
 );

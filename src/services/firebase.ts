@@ -7,7 +7,7 @@ A:  I initially did use the SDK. But then I noticed the app got injected with so
 */
 
 import axios, { AxiosError } from "axios";
-import { ICredentialsData } from "../contexts/vault/types";
+import { IVaultItemData } from "../contexts/vault/types";
 import { META_INFO_ENCRYPTION_KEY_HASH_FIELD } from "../constants";
 import firebaseConfigDev from "../config/firebase_config_dev.json";
 import firebaseConfigProd from "../config/firebase_config_prod.json";
@@ -154,29 +154,29 @@ function getCurrentUserId() {
   return currentUserId;
 }
 
-export async function listCredentials() {
-  const credentialsList: ICredentialsData[] = [];
+export async function listVaultItems() {
+  const vaultItemList: IVaultItemData[] = [];
   const { data } = await axios.get(
-    `${databaseURL}/users/${getCurrentUserId()}/credentials.json?auth=${currentIdToken}`
+    `${databaseURL}/users/${getCurrentUserId()}/vault.json?auth=${currentIdToken}`
   );
   for (let key in data) {
-    credentialsList.push({
+    vaultItemList.push({
       id: key,
       ...data[key],
     });
   }
-  return credentialsList;
+  return vaultItemList;
 }
 
 export async function createBackup() {
   const { data } = await axios.get(
     `${databaseURL}/users/${getCurrentUserId()}.json?auth=${currentIdToken}`
   );
-  const { credentials, metaInfo } = data;
+  const { vault, metaInfo } = data;
   await axios.patch(
     `${databaseURL}/users/${getCurrentUserId()}.json?auth=${currentIdToken}`,
     {
-      "credentials-backup": credentials,
+      "vault-backup": vault,
       "metaInfo-backup": metaInfo,
     }
   );
@@ -186,12 +186,12 @@ export async function restoreBackup() {
   const { data } = await axios.get(
     `${databaseURL}/users/${getCurrentUserId()}.json?auth=${currentIdToken}`
   );
-  const credentials = data["credentials-backup"];
+  const vault = data["vault-backup"];
   const metaInfo = data["metaInfo-backup"];
   await axios.patch(
     `${databaseURL}/users/${getCurrentUserId()}.json?auth=${currentIdToken}`,
     {
-      credentials,
+      vault,
       metaInfo,
     }
   );
@@ -199,21 +199,21 @@ export async function restoreBackup() {
 
 export async function deleteBackup() {
   await axios.delete(
-    `${databaseURL}/users/${getCurrentUserId()}/credentials-backup.json?auth=${currentIdToken}`
+    `${databaseURL}/users/${getCurrentUserId()}/vault-backup.json?auth=${currentIdToken}`
   );
   await axios.delete(
     `${databaseURL}/users/${getCurrentUserId()}/metaInfo-backup.json?auth=${currentIdToken}`
   );
 }
 
-export async function replaceAllCredentialsWithNewData(
+export async function replaceVaultWithNewData(
   data: any,
   encryptionKeyHash: string
 ) {
   await axios.patch(
     `${databaseURL}/users/${getCurrentUserId()}.json?auth=${currentIdToken}`,
     {
-      credentials: data,
+      vault: data,
     }
   );
   await axios.patch(
@@ -224,24 +224,24 @@ export async function replaceAllCredentialsWithNewData(
   );
 }
 
-export async function addCredentials(data: any) {
+export async function addVaultItem(data: any) {
   const res = await axios.post(
-    `${databaseURL}/users/${getCurrentUserId()}/credentials.json?auth=${currentIdToken}`,
+    `${databaseURL}/users/${getCurrentUserId()}/vault.json?auth=${currentIdToken}`,
     data
   );
   return { key: res.data.name };
 }
 
-export async function updateCredentials(docId: string, data: any) {
+export async function updateVaultItem(docId: string, data: any) {
   await axios.put(
-    `${databaseURL}/users/${getCurrentUserId()}/credentials/${docId}.json?auth=${currentIdToken}`,
+    `${databaseURL}/users/${getCurrentUserId()}/vault/${docId}.json?auth=${currentIdToken}`,
     data
   );
 }
 
-export async function deleteCredentials(docId: string) {
+export async function deleteVaultItem(docId: string) {
   await axios.delete(
-    `${databaseURL}/users/${getCurrentUserId()}/credentials/${docId}.json?auth=${currentIdToken}`
+    `${databaseURL}/users/${getCurrentUserId()}/vault/${docId}.json?auth=${currentIdToken}`
   );
 }
 
@@ -256,5 +256,22 @@ export async function updateMetaInfo(field: string, value: any) {
   await axios.patch(
     `${databaseURL}/users/${getCurrentUserId()}/metaInfo.json?auth=${currentIdToken}`,
     { [field]: value }
+  );
+}
+
+
+export async function migrateDatabaseFromCredentialsToVault() {
+  const { data } = await axios.get(
+    `${databaseURL}/users/${getCurrentUserId()}/credentials.json?auth=${currentIdToken}`
+  );
+  if (!data) {
+    return;
+  }
+  await axios.put(
+    `${databaseURL}/users/${getCurrentUserId()}/vault.json?auth=${currentIdToken}`,
+    data
+  );
+  await axios.delete(
+    `${databaseURL}/users/${getCurrentUserId()}/credentials.json?auth=${currentIdToken}`
   );
 }

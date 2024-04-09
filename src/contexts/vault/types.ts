@@ -1,5 +1,5 @@
 import { Encryptor } from "../../services/encryption";
-import { CredentialsActionType } from "./enums";
+import { VaultActionType } from "./enums";
 
 export enum DataType {
   Note = "Note",
@@ -7,7 +7,7 @@ export enum DataType {
   Both = "Credentials & Note",
 }
 
-export interface ICredentialsAddData {
+export interface IVaultItemAddData {
   type: DataType;
   name: string;
   note: string;
@@ -17,62 +17,62 @@ export interface ICredentialsAddData {
   password: string;
 }
 
-export interface ICredentialsData extends ICredentialsAddData {
+export interface IVaultItemData extends IVaultItemAddData {
   id: string;
 }
 
-export interface ICredentialsState {
+export interface IVaultState {
   isLoading: boolean;
   encryptor?: Encryptor;
-  credentials: ICredentialsData[];
+  items: IVaultItemData[];
 }
 
-type CredentialsLoadingStartAction = {
-  type: CredentialsActionType.START_LOADING_CREDENTIALS;
+type VaultLoadingStartAction = {
+  type: VaultActionType.START_LOADING_VAULT;
 };
 
-type CredentialsLoadAction = {
-  type: CredentialsActionType.LOAD_CREDENTIALS;
-  payload: Partial<ICredentialsState>;
+type VaultLoadAction = {
+  type: VaultActionType.LOAD_VAULT;
+  payload: Partial<IVaultState>;
 };
 
-type CredentialsAddAction = {
-  type: CredentialsActionType.ADD_NEW_CREDENTIALS;
-  payload: ICredentialsData;
+type VaultItemAddAction = {
+  type: VaultActionType.ADD_NEW_VAULT_ITEM;
+  payload: IVaultItemData;
 };
 
-type CredentialsUpdateAction = {
-  type: CredentialsActionType.UPDATE_CREDENTIALS;
+type VaultItemUpdateAction = {
+  type: VaultActionType.UPDATE_VAULT_ITEM;
   payload: {
     id: string;
-    update: ICredentialsAddData;
+    update: IVaultItemAddData;
   };
 };
 
-type CredentialsDeleteAction = {
-  type: CredentialsActionType.DELETE_CREDENTIALS;
+type VaultItemDeleteAction = {
+  type: VaultActionType.DELETE_VAULT_ITEM;
   payload: {
     id: string;
   };
 };
 
 type UpdateEncryptorAction = {
-  type: CredentialsActionType.UPDATE_ENCRYPTOR;
+  type: VaultActionType.UPDATE_ENCRYPTOR;
   payload: {
     encryptor: Encryptor;
   };
 };
 
 type ClearStateAction = {
-  type: CredentialsActionType.CLEAR_STATE;
+  type: VaultActionType.CLEAR_STATE;
   payload?: undefined;
 };
 
-export type ICredentialsAction =
-  | CredentialsLoadingStartAction
-  | CredentialsLoadAction
-  | CredentialsAddAction
-  | CredentialsUpdateAction
-  | CredentialsDeleteAction
+export type IVaultAction =
+  | VaultLoadingStartAction
+  | VaultLoadAction
+  | VaultItemAddAction
+  | VaultItemUpdateAction
+  | VaultItemDeleteAction
   | UpdateEncryptorAction
   | ClearStateAction;

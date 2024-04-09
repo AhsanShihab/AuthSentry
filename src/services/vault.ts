@@ -1,15 +1,15 @@
 import { META_INFO_ENCRYPTION_KEY_HASH_FIELD } from "../constants";
 import {
-  ICredentialsAddData,
-  ICredentialsData,
+  IVaultItemAddData,
+  IVaultItemData,
 } from "../contexts/vault/types";
 import { Encryptor, InvalidEncryptorError } from "./encryption";
 import * as firebase from "./firebase";
 
 const decryptData = async (
-  data: ICredentialsData,
+  data: IVaultItemData,
   encryptor: Encryptor
-): Promise<ICredentialsData> => {
+): Promise<IVaultItemData> => {
   const [name, note, email, password, username, siteUrl] = await Promise.all([
     encryptor.decrypt(data.name),
     data.note ? encryptor.decrypt(data.note) : Promise.resolve(""),
@@ -31,9 +31,9 @@ const decryptData = async (
 };
 
 const encryptData = async (
-  data: ICredentialsAddData,
+  data: IVaultItemAddData,
   encryptor: Encryptor
-): Promise<ICredentialsAddData> => {
+): Promise<IVaultItemAddData> => {
   const [name, note, email, password, username, siteUrl] = await Promise.all([
     encryptor.encrypt(data.name),
     data.note ? encryptor.encrypt(data.note) : Promise.resolve(""),
@@ -45,23 +45,23 @@ const encryptData = async (
   return { type: data.type, name, note, email, password, username, siteUrl };
 };
 
-export const addCredential = async (
-  data: ICredentialsAddData,
+export const addVaultItem = async (
+  data: IVaultItemAddData,
   encryptor: Encryptor
-): Promise<ICredentialsData> => {
+): Promise<IVaultItemData> => {
   const isValidEncryptor = await checkValidityOfEncryptionKey(encryptor);
   if (!isValidEncryptor) {
     throw new InvalidEncryptorError();
   }
   const encryptedData = await encryptData(data, encryptor);
-  const docReference = await firebase.addCredentials(encryptedData);
+  const docReference = await firebase.addVaultItem(encryptedData);
 
   return { ...data, id: docReference.key! };
 };
 
-export const updateCredentials = async (
+export const updateVaultItem = async (
   docId: string,
-  data: ICredentialsAddData,
+  data: IVaultItemAddData,
   encryptor: Encryptor
 ): Promise<void> => {
   const isValidEncryptor = await checkValidityOfEncryptionKey(encryptor);
@@ -69,40 +69,41 @@ export const updateCredentials = async (
     throw new InvalidEncryptorError();
   }
   const encryptedData = await encryptData(data, encryptor);
-  await firebase.updateCredentials(docId, encryptedData);
+  await firebase.updateVaultItem(docId, encryptedData);
 };
 
-export const deleteCredentials = async (docId: string): Promise<void> => {
-  await firebase.deleteCredentials(docId);
+export const deleteVaultItem = async (docId: string): Promise<void> => {
+  await firebase.deleteVaultItem(docId);
 };
 
-export const listCredentials = async (
+export const listVaultItems = async (
   encryptor: Encryptor
-): Promise<ICredentialsData[]> => {
+): Promise<IVaultItemData[]> => {
   const isValidEncryptor = await checkValidityOfEncryptionKey(encryptor);
   if (!isValidEncryptor) {
     throw new InvalidEncryptorError();
   }
-  const encryptedCredList = await firebase.listCredentials();
-  const decryptedListPromise = encryptedCredList.map((data) =>
+  const encryptedVaultItemList = await firebase.listVaultItems();
+  const decryptedListPromise = encryptedVaultItemList.map((data) =>
     decryptData(data, encryptor)
   );
-  return await Promise.all(decryptedListPromise);
+  const decrypted = await Promise.all(decryptedListPromise);
+  return decrypted;
 };
 
-export const listEncryptedCredentials = async (): Promise<
-  ICredentialsData[]
+export const listEncryptedVaultItems = async (): Promise<
+  IVaultItemData[]
 > => {
-  const encryptedCredList = await firebase.listCredentials();
-  return encryptedCredList;
+  const encryptedVaultItemList = await firebase.listVaultItems();
+  return encryptedVaultItemList;
 };
 
 export const reEncryptData = async (
   oldEncryptor: Encryptor,
   newEncryptor: Encryptor
 ) => {
-  const credentialsList = await listCredentials(oldEncryptor);
-  const reEncryptedDataPromise = credentialsList.map(async (item) => {
+  const vaultItemList = await listVaultItems(oldEncryptor);
+  const reEncryptedDataPromise = vaultItemList.map(async (item) => {
     const { id, ...data } = item;
     const encryptedData = await encryptData(data, newEncryptor);
     return {
@@ -111,13 +112,13 @@ export const reEncryptData = async (
     };
   });
   const reEncryptedCredsList = await Promise.all(reEncryptedDataPromise);
-  const mappedData: Record<string, ICredentialsAddData> = {};
+  const mappedData: Record<string, IVaultItemAddData> = {};
   reEncryptedCredsList.forEach((item) => {
     const { id, ...data } = item;
     mappedData[id] = data;
   });
   const newEncryptionKeyHash = await newEncryptor.getEncryptionKeyHash();
-  await firebase.replaceAllCredentialsWithNewData(mappedData, newEncryptionKeyHash);
+  await firebase.replaceVaultWithNewData(mappedData, newEncryptionKeyHash);
 };
 
 export const restoreBackup = async () => {

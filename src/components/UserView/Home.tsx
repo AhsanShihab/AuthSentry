@@ -14,9 +14,9 @@ import {
   SecretIcon,
   VerticalElipsisIcon,
 } from "../Common/Icons";
-import { useCredentials } from "../../contexts/vault/provider";
+import { useVault } from "../../contexts/vault/provider";
 import { useAuth } from "../../contexts/auth/provider";
-import { CredentialsActionType } from "../../contexts/vault/enums";
+import { VaultActionType } from "../../contexts/vault/enums";
 import { AuthActionType } from "../../contexts/auth/enums";
 import AddPasswordModal from "./AddPasswordModal";
 import DownloadModal from "./DownloadModal";
@@ -28,7 +28,7 @@ import VaultLoader from "./VaultLoader";
 
 function Home() {
   const [, authStateDispatch] = useAuth();
-  const [credentials, credentialsDispatch] = useCredentials();
+  const [vault, vaultDispatch] = useVault();
   const [showAddNewModal, setShowAddNewModal] = useState(false);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [showMasterPasswordUpdateModal, setShowMasterPasswordUpdateModal] =
@@ -36,7 +36,7 @@ function Home() {
   const [showSecretChangeModal, setShowSecretChangeModal] = useState(false);
 
   const refreshList = async () => {
-    const encryptor = credentials.encryptor!;
+    const encryptor = vault.encryptor!;
     const isEncryptorValid = await vaultService.checkValidityOfEncryptionKey(
       encryptor
     );
@@ -44,27 +44,27 @@ function Home() {
       // TODO
       return;
     }
-    credentialsDispatch({
-      type: CredentialsActionType.START_LOADING_CREDENTIALS,
+    vaultDispatch({
+      type: VaultActionType.START_LOADING_VAULT,
     });
-    const credentialsList = await vaultService.listCredentials(encryptor);
-    credentialsDispatch({
-      type: CredentialsActionType.LOAD_CREDENTIALS,
+    const vaultItemList = await vaultService.listVaultItems(encryptor);
+    vaultDispatch({
+      type: VaultActionType.LOAD_VAULT,
       payload: {
-        credentials: credentialsList,
+        items: vaultItemList,
       },
     });
   };
 
   const signOut = useCallback(async () => {
     await logOut();
-    credentialsDispatch({
-      type: CredentialsActionType.CLEAR_STATE,
+    vaultDispatch({
+      type: VaultActionType.CLEAR_STATE,
     });
     authStateDispatch({
       type: AuthActionType.LOGOUT_USER,
     });
-  }, [credentialsDispatch, authStateDispatch]);
+  }, [vaultDispatch, authStateDispatch]);
 
   const handleSecretChange = async () => {
     setShowSecretChangeModal(true);

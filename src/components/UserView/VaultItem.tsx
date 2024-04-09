@@ -4,20 +4,19 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { CheckIcon, CopyButtonIcon } from "../Common/Icons";
 import { generateRandomPassword } from "../../services/password_generator";
-import { deleteCredentials, updateCredentials } from "../../services/vault";
+import { deleteVaultItem, updateVaultItem } from "../../services/vault";
 import ConfirmationModal from "../Common/ConfirmationModal";
 import {
   DataType,
-  ICredentialsAddData,
-  ICredentialsData,
+  IVaultItemAddData,
+  IVaultItemData,
 } from "../../contexts/vault/types";
-import { useCredentials } from "../../contexts/vault/provider";
-import { CredentialsActionType } from "../../contexts/vault/enums";
+import { useVault } from "../../contexts/vault/provider";
+import { VaultActionType } from "../../contexts/vault/enums";
 import { NOTE_CHARACTER_LIMIT } from "../../constants";
 
-function VaultItem({ item }: { item: ICredentialsData }) {
-  const [credentials, dispatchCredentials] = useCredentials();
-  const [, credentialsDispatch] = useCredentials();
+function VaultItem({ item }: { item: IVaultItemData }) {
+  const [vault, vaultDispatch] = useVault();
   const [isReadOnly, setIsReadOnly] = useState(true);
   const [name, setName] = useState(item.name);
   const [type, setType] = useState(item.type);
@@ -52,7 +51,7 @@ function VaultItem({ item }: { item: ICredentialsData }) {
 
   const handleUpdate = async () => {
     const docId = item.id;
-    const data: ICredentialsAddData = {
+    const data: IVaultItemAddData = {
       type,
       name,
       note,
@@ -61,9 +60,9 @@ function VaultItem({ item }: { item: ICredentialsData }) {
       email,
       username,
     };
-    await updateCredentials(docId, data, credentials.encryptor!);
-    dispatchCredentials({
-      type: CredentialsActionType.UPDATE_CREDENTIALS,
+    await updateVaultItem(docId, data, vault.encryptor!);
+    vaultDispatch({
+      type: VaultActionType.UPDATE_VAULT_ITEM,
       payload: {
         id: item.id,
         update: data,
@@ -77,9 +76,9 @@ function VaultItem({ item }: { item: ICredentialsData }) {
   };
 
   const handleDeleteConfirmation = async () => {
-    await deleteCredentials(item.id);
-    credentialsDispatch({
-      type: CredentialsActionType.DELETE_CREDENTIALS,
+    await deleteVaultItem(item.id);
+    vaultDispatch({
+      type: VaultActionType.DELETE_VAULT_ITEM,
       payload: {
         id: item.id,
       },
@@ -344,7 +343,7 @@ function VaultItem({ item }: { item: ICredentialsData }) {
       {showConfirmModal && (
         <ConfirmationModal
           title={"Delete password"}
-          message={`Are you sure you want to delete all the credentials data for ${item.name}`}
+          message={`Are you sure you want to delete all the data for ${item.name}`}
           onCancel={() => {
             setShowConfirmModal(false);
           }}

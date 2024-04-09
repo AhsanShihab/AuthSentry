@@ -3,7 +3,7 @@ import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import Authentication from "./GuestView/Authentication";
 import Home from "./UserView/Home";
-import { CredentialsContextProvider } from "../contexts/vault/provider";
+import { VaultContextProvider } from "../contexts/vault/provider";
 import { useAuth } from "../contexts/auth/provider";
 import { usePWAContext } from "../contexts/pwa/provider";
 
@@ -31,9 +31,9 @@ function Main() {
           <h1 className="display-1">AuthSentry</h1>
         </div>
       ) : authState.user ? (
-        <CredentialsContextProvider>
+        <VaultContextProvider>
           <Home />
-        </CredentialsContextProvider>
+        </VaultContextProvider>
       ) : (
         <Authentication />
       )}

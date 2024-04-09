@@ -5,17 +5,17 @@ import Form from "react-bootstrap/Form";
 import Accordion from "react-bootstrap/Accordion";
 import Placeholder from "react-bootstrap/Placeholder";
 import { VaultIcon } from "../Common/Icons";
-import { useCredentials } from "../../contexts/vault/provider";
+import { useVault } from "../../contexts/vault/provider";
 import VaultItem from "./VaultItem";
 
 function VaultItemList() {
-  const [credentials] = useCredentials();
+  const [vault] = useVault();
   const [searchString, setSearchString] = useState("");
-  const filteredCredentialsList = credentials.credentials.filter((item) =>
+  const filteredVaultItems = vault.items.filter((item) =>
     item.name.toLowerCase().includes(searchString.toLowerCase())
   );
 
-  filteredCredentialsList.sort((a, b) => a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1);
+  filteredVaultItems.sort((a, b) => a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1);
 
   return (
     <>
@@ -34,7 +34,7 @@ function VaultItemList() {
       <Row className="mt-3">
         <Col>
           <Accordion>
-            {credentials.isLoading ? (
+            {vault.isLoading ? (
               <>
                 <Placeholder as={Accordion.Item} xs={12} eventKey="1">
                   <Placeholder as={Accordion.Header} animation="glow">
@@ -52,19 +52,19 @@ function VaultItemList() {
                   </Placeholder>
                 </Placeholder>
               </>
-            ) : credentials.credentials.length === 0 ? (
+            ) : vault.items.length === 0 ? (
               <div className="mt-5 text-center">
                 <VaultIcon />
                 <p className="text-center text-body-secondary mt-2">
                   Your vault is empty
                 </p>
               </div>
-            ) : filteredCredentialsList.length === 0 ? (
+            ) : filteredVaultItems.length === 0 ? (
               <>
                 <p className="fw-light">No result found</p>
               </>
             ) : (
-              filteredCredentialsList.map((item) => (
+              filteredVaultItems.map((item) => (
                 <VaultItem item={item} key={item.id} />
               ))
             )}

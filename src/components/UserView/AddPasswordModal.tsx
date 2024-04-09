@@ -6,12 +6,12 @@ import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import { CheckIcon, CopyButtonIcon } from "../Common/Icons";
-import { useCredentials } from "../../contexts/vault/provider";
+import { useVault } from "../../contexts/vault/provider";
 import {
   DataType,
-  ICredentialsAddData,
+  IVaultItemAddData,
 } from "../../contexts/vault/types";
-import { CredentialsActionType } from "../../contexts/vault/enums";
+import { VaultActionType } from "../../contexts/vault/enums";
 import { generateRandomPassword } from "../../services/password_generator";
 import * as vaultService from "../../services/vault";
 import { NOTE_CHARACTER_LIMIT } from "../../constants";
@@ -23,7 +23,7 @@ function AddPasswordModal({
   isOpen: boolean;
   hideModal: () => void;
 }) {
-  const [credentials, credentialsDispatch] = useCredentials();
+  const [vault, vaultDispatch] = useVault();
   const [name, setName] = useState("");
   const [type, setType] = useState<DataType>(DataType.Credentails);
   const [note, setNote] = useState("");
@@ -69,7 +69,7 @@ function AddPasswordModal({
   };
 
   const handleAdd = async () => {
-    const submitData: ICredentialsAddData = {
+    const submitData: IVaultItemAddData = {
       type,
       name,
       note: [DataType.Note, DataType.Both].includes(type) ? note : "",
@@ -84,12 +84,12 @@ function AddPasswordModal({
         ? password
         : "",
     };
-    const data = await vaultService.addCredential(
+    const data = await vaultService.addVaultItem(
       submitData,
-      credentials.encryptor!
+      vault.encryptor!
     );
-    credentialsDispatch({
-      type: CredentialsActionType.ADD_NEW_CREDENTIALS,
+    vaultDispatch({
+      type: VaultActionType.ADD_NEW_VAULT_ITEM,
       payload: data,
     });
     closeModal();

@@ -3,8 +3,8 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import { useCredentials } from "../../contexts/vault/provider";
-import * as vault from "../../services/vault";
+import { useVault } from "../../contexts/vault/provider";
+import * as vaultService from "../../services/vault";
 import * as authentication from "../../services/authentication";
 import { useState } from "react";
 import { DataType } from "../../contexts/vault/types";
@@ -16,7 +16,7 @@ function DownloadModal({
   show: boolean;
   toggle: () => void;
 }) {
-  const [credentials,] = useCredentials();
+  const [vault,] = useVault();
   const [downloadUnencrypted, setDownloadUnencrypted] = useState(false);
   const [password, setPassword] = useState("");
   const [isPasswordIncorrect, setIsPasswordIncorrect] = useState(false);
@@ -34,10 +34,10 @@ function DownloadModal({
       setIsPasswordIncorrect(true);
       return;
     }
-    const credentialsList = downloadUnencrypted
-      ? credentials.credentials
-      : await vault.listEncryptedCredentials();
-    const filteredList = credentialsList.filter(item => item.type === type);
+    const vaultItemList = downloadUnencrypted
+      ? vault.items
+      : await vaultService.listEncryptedVaultItems();
+    const filteredList = vaultItemList.filter(item => item.type === type);
 
     // create file in browser
     const fileName = `AuthSentry - list of ${type}`;

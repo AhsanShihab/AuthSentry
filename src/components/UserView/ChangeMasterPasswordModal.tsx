@@ -5,8 +5,8 @@ import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
 import MasterPasswordRegistrationInput from "../Common/MasterPasswordRegistrationInput";
 import { CheckIcon, CrossIcon, ExclaimationIcon } from "../Common/Icons";
-import { useCredentials } from "../../contexts/vault/provider";
-import { CredentialsActionType } from "../../contexts/vault/enums";
+import { useVault } from "../../contexts/vault/provider";
+import { VaultActionType } from "../../contexts/vault/enums";
 import { updateMasterPassword } from "../../services/authentication";
 
 function ChangeMasterPasswordModal({
@@ -16,7 +16,7 @@ function ChangeMasterPasswordModal({
   show: boolean;
   closeModal: () => void;
 }) {
-  const [credentials, credentialsDispatch] = useCredentials();
+  const [vault, vaultDispatch] = useVault();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
@@ -62,13 +62,13 @@ function ChangeMasterPasswordModal({
     updateMasterPassword(
       newPassword,
       currentPassword,
-      credentials.encryptor!,
+      vault.encryptor!,
       operationStatusUpdateCallback
     )
       .then((newEncryptor) => {
         if (newEncryptor) {
-          credentialsDispatch({
-            type: CredentialsActionType.UPDATE_ENCRYPTOR,
+          vaultDispatch({
+            type: VaultActionType.UPDATE_ENCRYPTOR,
             payload: {
               encryptor: newEncryptor!,
             },

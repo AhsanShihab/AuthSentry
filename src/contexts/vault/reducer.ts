@@ -1,38 +1,38 @@
-import { CredentialsActionType } from "./enums";
-import { ICredentialsAction, ICredentialsState } from "./types";
+import { VaultActionType } from "./enums";
+import { IVaultAction, IVaultState } from "./types";
 
-export function credentialsReducer(
-  state: ICredentialsState,
-  action: ICredentialsAction
-): ICredentialsState {
+export function vaultReducer(
+  state: IVaultState,
+  action: IVaultAction
+): IVaultState {
   switch (action.type) {
-    case CredentialsActionType.START_LOADING_CREDENTIALS: {
+    case VaultActionType.START_LOADING_VAULT: {
       return { ...state, isLoading: true };
     }
-    case CredentialsActionType.LOAD_CREDENTIALS: {
+    case VaultActionType.LOAD_VAULT: {
       return { ...state, ...action.payload, isLoading: false };
     }
-    case CredentialsActionType.ADD_NEW_CREDENTIALS: {
-      return { ...state, credentials: [...state.credentials, action.payload] };
+    case VaultActionType.ADD_NEW_VAULT_ITEM: {
+      return { ...state, items: [...state.items, action.payload] };
     }
-    case CredentialsActionType.UPDATE_CREDENTIALS: {
+    case VaultActionType.UPDATE_VAULT_ITEM: {
       const id = action.payload.id;
-      const updatedList = state.credentials.map((item) =>
+      const updatedList = state.items.map((item) =>
         item.id !== id ? item : { ...item, ...action.payload.update }
       );
-      return { ...state, credentials: updatedList };
+      return { ...state, items: updatedList };
     }
-    case CredentialsActionType.DELETE_CREDENTIALS: {
+    case VaultActionType.DELETE_VAULT_ITEM: {
       const id = action.payload.id;
-      const updatedList = state.credentials.filter((item) => item.id !== id);
-      return { ...state, credentials: updatedList };
+      const updatedList = state.items.filter((item) => item.id !== id);
+      return { ...state, items: updatedList };
     }
-    case CredentialsActionType.UPDATE_ENCRYPTOR: {
+    case VaultActionType.UPDATE_ENCRYPTOR: {
       return { ...state, encryptor: action.payload.encryptor };
     }
 
-    case CredentialsActionType.CLEAR_STATE: {
-      return { credentials: [], isLoading: false, encryptor: undefined };
+    case VaultActionType.CLEAR_STATE: {
+      return { items: [], isLoading: false, encryptor: undefined };
     }
 
     default:

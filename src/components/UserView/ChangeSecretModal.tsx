@@ -4,8 +4,8 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
 import { CheckIcon, CrossIcon, ExclaimationIcon } from "../Common/Icons";
-import { useCredentials } from "../../contexts/vault/provider";
-import { CredentialsActionType } from "../../contexts/vault/enums";
+import { useVault } from "../../contexts/vault/provider";
+import { VaultActionType } from "../../contexts/vault/enums";
 import { updateSecret } from "../../services/authentication";
 import SecretInput from "../Common/SecretInput";
 
@@ -16,7 +16,7 @@ function ChangeSecretModal({
   show: boolean;
   closeModal: () => void;
 }) {
-  const [credentials, credentialsDispatch] = useCredentials();
+  const [vault, vaultDispatch] = useVault();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newSecret, setNewSecret] = useState("");
   const [isSecretReady, setIsSecretReady] = useState(false);
@@ -58,13 +58,13 @@ function ChangeSecretModal({
     updateSecret(
       newSecret,
       currentPassword,
-      credentials.encryptor!,
+      vault.encryptor!,
       operationStatusUpdateCallback
     )
       .then((newEncryptor) => {
         if (newEncryptor) {
-          credentialsDispatch({
-            type: CredentialsActionType.UPDATE_ENCRYPTOR,
+          vaultDispatch({
+            type: VaultActionType.UPDATE_ENCRYPTOR,
             payload: {
               encryptor: newEncryptor,
             },
