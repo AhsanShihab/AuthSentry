@@ -37,21 +37,23 @@ function Home() {
 
   const refreshList = async () => {
     const encryptor = vault.encryptor!;
-    const isEncryptorValid = await vaultService.checkValidityOfEncryptionKey(
-      encryptor
-    );
-    if (!isEncryptorValid) {
-      // TODO
-      return;
-    }
     vaultDispatch({
       type: VaultActionType.START_LOADING_VAULT,
     });
-    const vaultItemList = await vaultService.listVaultItems(encryptor);
+
+    for await (let item of vaultService.listVaultItemsGenerator(encryptor)) {
+      vaultDispatch({
+        type: VaultActionType.LOAD_ITEMS_IN_BATCH,
+        payload: {
+          items: item,
+          encryptor: encryptor,
+        },
+      });
+    }
     vaultDispatch({
-      type: VaultActionType.LOAD_VAULT,
+      type: VaultActionType.LOAD_ITEMS_IN_BATCH,
       payload: {
-        items: vaultItemList,
+        isLoading: false,
       },
     });
   };

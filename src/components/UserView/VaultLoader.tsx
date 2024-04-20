@@ -50,15 +50,22 @@ function VaultLoader() {
 
     try {
       await migrateDatabaseFromCredentialsToVault();
-      const vaultItemList = await vaultService.listVaultItems(encryptor);
+      for await (let item of vaultService.listVaultItemsGenerator(encryptor)) {
+        vaultDispatch({
+          type: VaultActionType.LOAD_ITEMS_IN_BATCH,
+          payload: {
+            items: item,
+            encryptor: encryptor,
+          },
+        });
+      }
       vaultDispatch({
-        type: VaultActionType.LOAD_VAULT,
+        type: VaultActionType.LOAD_ITEMS_IN_BATCH,
         payload: {
-          items: vaultItemList,
           isLoading: false,
-          encryptor: encryptor,
         },
       });
+
       setSecret("");
     } catch (err) {
       if (!(err instanceof InvalidEncryptorError)) {

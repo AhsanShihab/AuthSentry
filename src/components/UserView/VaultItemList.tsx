@@ -15,8 +15,6 @@ function VaultItemList() {
     item.name.toLowerCase().includes(searchString.toLowerCase())
   );
 
-  filteredVaultItems.sort((a, b) => a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1);
-
   return (
     <>
       <Row className="mt-3">
@@ -34,7 +32,23 @@ function VaultItemList() {
       <Row className="mt-3">
         <Col>
           <Accordion>
-            {vault.isLoading ? (
+            {!vault.isLoading && vault.items.length === 0 ? (
+              <div className="mt-5 text-center">
+                <VaultIcon />
+                <p className="text-center text-body-secondary mt-2">
+                  Your vault is empty
+                </p>
+              </div>
+            ) : !vault.isLoading && filteredVaultItems.length === 0 ? (
+              <>
+                <p className="fw-light">No result found</p>
+              </>
+            ) : (
+              filteredVaultItems.map((item) => (
+                <VaultItem item={item} key={item.id} />
+              ))
+            )}
+            {vault.isLoading && (
               <>
                 <Placeholder as={Accordion.Item} xs={12} eventKey="1">
                   <Placeholder as={Accordion.Header} animation="glow">
@@ -52,21 +66,6 @@ function VaultItemList() {
                   </Placeholder>
                 </Placeholder>
               </>
-            ) : vault.items.length === 0 ? (
-              <div className="mt-5 text-center">
-                <VaultIcon />
-                <p className="text-center text-body-secondary mt-2">
-                  Your vault is empty
-                </p>
-              </div>
-            ) : filteredVaultItems.length === 0 ? (
-              <>
-                <p className="fw-light">No result found</p>
-              </>
-            ) : (
-              filteredVaultItems.map((item) => (
-                <VaultItem item={item} key={item.id} />
-              ))
             )}
           </Accordion>
         </Col>

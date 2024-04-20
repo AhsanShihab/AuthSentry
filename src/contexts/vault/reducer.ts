@@ -7,13 +7,25 @@ export function vaultReducer(
 ): IVaultState {
   switch (action.type) {
     case VaultActionType.START_LOADING_VAULT: {
-      return { ...state, isLoading: true };
+      return { ...state, items: [], isLoading: true };
     }
     case VaultActionType.LOAD_VAULT: {
       return { ...state, ...action.payload, isLoading: false };
     }
+    case VaultActionType.LOAD_ITEMS_IN_BATCH: {
+      let items = state.items;
+      const existingItemIds = items.map((item) => item.id);
+      for (const item of action.payload.items || []) {
+        if (!existingItemIds.includes(item.id)) {
+          items.push(item);
+        }
+      }
+      return { ...state, ...action.payload, items };
+    }
     case VaultActionType.ADD_NEW_VAULT_ITEM: {
-      return { ...state, items: [...state.items, action.payload] };
+      const newItemsList = [...state.items, action.payload]
+      newItemsList.sort((a, b) => a.name > b.name ? 1 : -1);
+      return { ...state, items: newItemsList };
     }
     case VaultActionType.UPDATE_VAULT_ITEM: {
       const id = action.payload.id;

@@ -36,6 +36,11 @@ type VaultLoadAction = {
   payload: Partial<IVaultState>;
 };
 
+type VaultBatchLoadAction = {
+  type: VaultActionType.LOAD_ITEMS_IN_BATCH;
+  payload: Partial<IVaultState>;
+};
+
 type VaultItemAddAction = {
   type: VaultActionType.ADD_NEW_VAULT_ITEM;
   payload: IVaultItemData;
@@ -71,6 +76,7 @@ type ClearStateAction = {
 export type IVaultAction =
   | VaultLoadingStartAction
   | VaultLoadAction
+  | VaultBatchLoadAction
   | VaultItemAddAction
   | VaultItemUpdateAction
   | VaultItemDeleteAction
