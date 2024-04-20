@@ -2,6 +2,8 @@ import { useState } from "react";
 import Accordion from "react-bootstrap/Accordion";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
+import Badge from 'react-bootstrap/Badge';
+
 import { CheckIcon, CopyButtonIcon } from "../Common/Icons";
 import { generateRandomPassword } from "../../services/password_generator";
 import { deleteVaultItem, updateVaultItem } from "../../services/vault";
@@ -59,6 +61,8 @@ function VaultItem({ item }: { item: IVaultItemData }) {
       password,
       email,
       username,
+      passwordUpdatedAt:
+        password !== item.password ? Date.now() : item.passwordUpdatedAt,
     };
     await updateVaultItem(docId, data, vault.encryptor!);
     vaultDispatch({
@@ -85,6 +89,16 @@ function VaultItem({ item }: { item: IVaultItemData }) {
     });
   };
 
+  const isPasswordOld = () => {
+    if (!item.passwordUpdatedAt) {
+      return false;
+    }
+    const timeNow = Date.now();
+    const lastUpdatedAt = item.passwordUpdatedAt;
+    const threeMonths = 3 * 30 * 24 * 60 * 60 * 1000;
+    return timeNow - lastUpdatedAt > threeMonths;
+  }
+
   const isReadyToUpdate =
     Boolean(name) &&
     (type === DataType.Credentails
@@ -95,7 +109,16 @@ function VaultItem({ item }: { item: IVaultItemData }) {
 
   return (
     <Accordion.Item eventKey={item.id}>
-      <Accordion.Header>{item.name}</Accordion.Header>
+      <Accordion.Header>
+        {item.name}
+        {isPasswordOld() && (
+          <span className="ps-3">
+            <Badge pill bg="warning">
+              password needs change
+            </Badge>
+          </span>
+        )}
+      </Accordion.Header>
       <Accordion.Body>
         {isReadOnly ? (
           <table className="border-0">
@@ -155,6 +178,21 @@ function VaultItem({ item }: { item: IVaultItemData }) {
                           <CopyButtonIcon />
                         )}
                       </Button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="pt-2 pe-2 border-0">
+                      Password last updated at
+                    </td>
+                    <td className="pt-2 pe-2 border-0">:</td>
+                    <td
+                      className={`pt-2 border-0 ${
+                        isPasswordOld() ? "text-danger" : ""
+                      }`}
+                    >
+                      {item.passwordUpdatedAt
+                        ? new Date(item.passwordUpdatedAt).toLocaleDateString()
+                        : null}
                     </td>
                   </tr>
                 </>

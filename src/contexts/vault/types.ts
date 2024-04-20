@@ -15,6 +15,7 @@ export interface IVaultItemAddData {
   email: string;
   username: string;
   password: string;
+  passwordUpdatedAt: number | null;
 }
 
 export interface IVaultItemData extends IVaultItemAddData {

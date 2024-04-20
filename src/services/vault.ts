@@ -18,6 +18,7 @@ const decryptData = async (
     id: data.id,
     type: data.type,
     name: data.name,
+    passwordUpdatedAt: data.passwordUpdatedAt,
     note,
     email,
     password,
@@ -40,6 +41,7 @@ const encryptData = async (
   return {
     type: data.type,
     name: data.name,
+    passwordUpdatedAt: data.passwordUpdatedAt,
     note,
     email,
     password,

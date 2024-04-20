@@ -7,10 +7,7 @@ import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import { CheckIcon, CopyButtonIcon } from "../Common/Icons";
 import { useVault } from "../../contexts/vault/provider";
-import {
-  DataType,
-  IVaultItemAddData,
-} from "../../contexts/vault/types";
+import { DataType, IVaultItemAddData } from "../../contexts/vault/types";
 import { VaultActionType } from "../../contexts/vault/enums";
 import { generateRandomPassword } from "../../services/password_generator";
 import * as vaultService from "../../services/vault";
@@ -83,11 +80,12 @@ function AddPasswordModal({
       password: [DataType.Credentails, DataType.Both].includes(type)
         ? password
         : "",
+      passwordUpdatedAt: null,
     };
-    const data = await vaultService.addVaultItem(
-      submitData,
-      vault.encryptor!
-    );
+    if (submitData.password) {
+      submitData.passwordUpdatedAt = Date.now();
+    }
+    const data = await vaultService.addVaultItem(submitData, vault.encryptor!);
     vaultDispatch({
       type: VaultActionType.ADD_NEW_VAULT_ITEM,
       payload: data,
