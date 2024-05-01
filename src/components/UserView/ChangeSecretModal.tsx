@@ -7,7 +7,7 @@ import { CheckIcon, CrossIcon, ExclaimationIcon } from "../Common/Icons";
 import { useVault } from "../../contexts/vault/provider";
 import { VaultActionType } from "../../contexts/vault/enums";
 import { updateSecret } from "../../services/authentication";
-import SecretInput from "../Common/SecretInput";
+import EncryptionSecretInput from "../Common/EncryptionSecretInput";
 
 function ChangeSecretModal({
   show,
@@ -94,7 +94,7 @@ function ChangeSecretModal({
               onChange={(e) => setCurrentPassword(e.target.value)}
             />
           </Form.Group>
-          <SecretInput
+          <EncryptionSecretInput
             className="mb-3 mt-5"
             label="Tell me your new secret"
             value={newSecret}

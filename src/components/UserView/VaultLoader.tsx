@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import SecretInput from "../Common/SecretInput";
+import EncryptionSecretInput from "../Common/EncryptionSecretInput";
 import { useAuth } from "../../contexts/auth/provider";
 import { Encryptor, InvalidEncryptorError } from "../../services/encryption";
 import * as vaultService from "../../services/vault";
@@ -100,7 +100,7 @@ function VaultLoader() {
       <Modal.Body>
         <p>{secretAskingMessage}</p>
         <Form>
-          <SecretInput
+          <EncryptionSecretInput
             className="mb-3"
             onChange={setSecret}
             showValidation={false}

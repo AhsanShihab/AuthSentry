@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
@@ -8,24 +8,25 @@ function SignIn({
   email,
   password,
   isAuthenticating,
-  setEmail,
-  setPassword,
+  onEmailChange,
+  onPasswordChange,
   setIsAuthenticating,
   onSignIn,
 }: {
   email: string;
   password: string;
   isAuthenticating: boolean;
-  setEmail: React.Dispatch<React.SetStateAction<string>>;
-  setPassword: React.Dispatch<React.SetStateAction<string>>;
-  setIsAuthenticating: React.Dispatch<React.SetStateAction<boolean>>;
+  onEmailChange: (email: string) => void;
+  onPasswordChange: (password: string) => void;
+  setIsAuthenticating: (value: boolean) => void;
   onSignIn: () => Promise<void>;
 }) {
   const [isProcessingSignIn, setIsProcessingSignIn] = useState(false);
   const [signInErrorMsg, setSignInErrorMsg] = useState("");
   const [invalidEmailErrMsg, setInvalidEmailErrMsg] = useState("");
 
-  const handleLogin = async () => {
+  const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setIsAuthenticating(true);
     setIsProcessingSignIn(true);
     setSignInErrorMsg("");
@@ -51,9 +52,10 @@ function SignIn({
     }
   };
 
-  const isReadyForLogin = password && email;
+  const isReadyForLogin = !!password && !!email;
+
   return (
-    <Form>
+    <Form onSubmit={handleLogin}>
       <Form.Group className="mb-3">
         <Form.Label>Email address</Form.Label>
         <Form.Control
@@ -61,7 +63,7 @@ function SignIn({
           placeholder="Enter email"
           value={email}
           isInvalid={Boolean(invalidEmailErrMsg)}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => onEmailChange(e.target.value)}
         />
         <Form.Control.Feedback type="invalid">
           {invalidEmailErrMsg}
@@ -74,7 +76,7 @@ function SignIn({
           type="password"
           placeholder="Password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => onPasswordChange(e.target.value)}
         />
         <Form.Text className="text-muted">
           Forgot password? Opps!
@@ -91,7 +93,7 @@ function SignIn({
       )}
       <Button
         variant="outline-secondary"
-        onClick={handleLogin}
+        type="submit"
         disabled={!isReadyForLogin || isAuthenticating}
       >
         {isProcessingSignIn ? (

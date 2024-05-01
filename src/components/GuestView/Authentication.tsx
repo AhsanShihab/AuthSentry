@@ -32,6 +32,14 @@ function Authentication() {
     });
   };
 
+  const onEmailChange = (email: string) => {
+    setEmail(email);
+  }
+
+  const onPasswordChange = (password: string) => {
+    setPassword(password)
+  }
+
   useEffect(() => {
     const value = secureLocalStorage.getItem("last_logged_in_email");
     if (value) {
@@ -56,8 +64,8 @@ function Authentication() {
                 email={email}
                 password={password}
                 isAuthenticating={isAuthenticating}
-                setEmail={setEmail}
-                setPassword={setPassword}
+                onEmailChange={onEmailChange}
+                onPasswordChange={onPasswordChange}
                 onSignIn={prepareApp}
                 setIsAuthenticating={setIsAuthenticating}
               />
@@ -66,8 +74,8 @@ function Authentication() {
               <SignUp
                 email={email}
                 password={password}
-                setEmail={setEmail}
-                setPassword={setPassword}
+                onEmailChange={onEmailChange}
+                onPasswordChange={onPasswordChange}
                 isAuthenticating={isAuthenticating}
                 onSignUp={prepareApp}
                 setIsAuthenticating={setIsAuthenticating}

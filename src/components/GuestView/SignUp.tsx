@@ -1,27 +1,27 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
 import MasterPasswordRegistrationInput from "../Common/MasterPasswordRegistrationInput";
 import { register } from "../../services/authentication";
-import SecretInput from "../Common/SecretInput";
+import EncryptionSecretInput from "../Common/EncryptionSecretInput";
 import { Encryptor } from "../../services/encryption";
 
 function SignUp({
   email,
   password,
   isAuthenticating,
-  setEmail,
-  setPassword,
+  onEmailChange,
+  onPasswordChange,
   setIsAuthenticating,
   onSignUp,
 }: {
   email: string;
   password: string;
   isAuthenticating: boolean;
-  setEmail: React.Dispatch<React.SetStateAction<string>>;
-  setPassword: React.Dispatch<React.SetStateAction<string>>;
-  setIsAuthenticating: React.Dispatch<React.SetStateAction<boolean>>;
+  onEmailChange: (email: string) => void;
+  onPasswordChange: (password: string) => void;
+  setIsAuthenticating: (value: boolean) => void;
   onSignUp: () => Promise<void>;
 }) {
   const [secret, setSecret] = useState("");
@@ -31,7 +31,8 @@ function SignUp({
   const [isSecretReady, setIsSecretReady] = useState(false);
   const [isProcessingSignUp, setIsProcessingSignUp] = useState(false);
 
-  const handleSignup = async () => {
+  const handleSignup = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setIsAuthenticating(true);
     setIsProcessingSignUp(true);
     setInvalidEmailErrMsg("");
@@ -63,7 +64,7 @@ function SignUp({
   const isReadyForSignUp = isPasswordReady && isEmailReady && isSecretReady;
 
   return (
-    <Form>
+    <Form onSubmit={handleSignup}>
       <Form.Group className="mb-3">
         <Form.Label>Email address</Form.Label>
         <Form.Control
@@ -71,7 +72,7 @@ function SignUp({
           placeholder="Enter email"
           value={email}
           isInvalid={Boolean(invalidEmailErrMsg)}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => onEmailChange(e.target.value)}
         />
         <Form.Control.Feedback type="invalid">
           {invalidEmailErrMsg}
@@ -84,10 +85,10 @@ function SignUp({
         placeholder="Master Password"
         formText="This is the only password you will need to remember. If you forget
       this, there will be no way to recover your data."
-        onChange={setPassword}
+        onChange={onPasswordChange}
         onValidityChange={setIsPasswordValid}
       />
-      <SecretInput
+      <EncryptionSecretInput
         className="mb-3"
         label="Tell me a secret"
         placeholder="Secret"
@@ -100,7 +101,7 @@ function SignUp({
           The Secret will be stored locally in a secured way. You won't be asked
           the secret again unless you login from another device or clear your
           browser data. In those cases, you will need to remember the{" "}
-          <strong>exact secret</strong> you enter here.
+          <strong>exact value</strong> you enter here.
           <br />
           <br />
           Your data encryption key is derived from combining both your master
@@ -112,7 +113,7 @@ function SignUp({
           NOTE that if you forget either your master password or secret, there
           is <strong>NO WAY</strong> to recover your data.
         </Form.Text>
-      </SecretInput>
+      </EncryptionSecretInput>
 
       {signUpErrorMsg && (
         <p className="text-danger">
@@ -121,7 +122,7 @@ function SignUp({
       )}
       <Button
         variant="outline-secondary"
-        onClick={handleSignup}
+        type="submit"
         disabled={!isReadyForSignUp || isAuthenticating}
       >
         {isProcessingSignUp ? (
