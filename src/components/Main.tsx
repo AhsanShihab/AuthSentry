@@ -16,7 +16,8 @@ function Main() {
     <div>
       {!isInstalled && showInstallMessage && (
         <Alert
-          variant="primary d-block d-md-flex justify-content-center align-items-center gap-1 rounded-0"
+          className="d-block d-md-flex justify-content-center align-items-center gap-1 rounded-0"
+          variant="primary"
           dismissible
           onClose={() => setShowInstallMessage(false)}
         >
