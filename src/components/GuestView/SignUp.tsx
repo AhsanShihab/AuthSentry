@@ -39,7 +39,9 @@ function SignUp({
     setSignUpErrorMsg("");
     try {
       await register(email, password);
-      new Encryptor(email, password).secret = secret;
+      const encryptor = new Encryptor(email, password);
+      encryptor.secret = secret;
+      encryptor.saveSecret();
       await onSignUp();
     } catch (err: any) {
       if (err.code === "auth/invalid-email") {

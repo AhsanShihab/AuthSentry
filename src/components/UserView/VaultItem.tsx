@@ -18,7 +18,7 @@ import { VaultActionType } from "../../contexts/vault/enums";
 import { NOTE_CHARACTER_LIMIT } from "../../constants";
 
 function VaultItem({ item }: { item: IVaultItemData }) {
-  const [vault, vaultDispatch] = useVault();
+  const [, vaultDispatch] = useVault();
   const [isReadOnly, setIsReadOnly] = useState(true);
   const [name, setName] = useState(item.name);
   const [type, setType] = useState(item.type);
@@ -64,7 +64,7 @@ function VaultItem({ item }: { item: IVaultItemData }) {
       passwordUpdatedAt:
         password !== item.password ? Date.now() : item.passwordUpdatedAt,
     };
-    await updateVaultItem(docId, data, vault.encryptor!);
+    await updateVaultItem(docId, data);
     vaultDispatch({
       type: VaultActionType.UPDATE_VAULT_ITEM,
       payload: {

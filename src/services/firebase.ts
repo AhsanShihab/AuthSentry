@@ -1,6 +1,6 @@
 /*
 Q:  Why am I making direct REST api calls to firebase instead of using the firebase sdk package?
-A:  I initially did use the SDK. But then I noticed the app got injected with some google tracker,
+A:  I first used the SDK. But then I noticed the app got injected with some google tracker,
     of which I had no idea. For a security focused app, like a password manager,
     having an unknown tracker is not acceptable. So I removed the package, and
     reimplemented it using the direct REST API calls.
@@ -119,7 +119,7 @@ export async function logIn(email: string, password: string) {
   }
 }
 
-export async function logOut() {
+export function logOut() {
   currentIdToken = null;
   currentRefreshToken = null;
   currentUserId = null;

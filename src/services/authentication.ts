@@ -29,7 +29,6 @@ export const verifyPassword = async (password: string) => {
 export const updateMasterPassword = async (
   newPassword: string,
   oldPassword: string,
-  encryptor: Encryptor,
   operationStatusCallback: (
     updateType: "previous" | "new",
     update: { msg?: string; status: "done" | "failed" | "warning" | "ongoing" }
@@ -76,7 +75,7 @@ export const updateMasterPassword = async (
   const email = getCurrentUser()!.email!;
   const newEncryptor = new Encryptor(email, newPassword);
   try {
-    await vault.reEncryptData(encryptor, newEncryptor);
+    await vault.reEncryptData(newEncryptor);
     operationStatusCallback("previous", { status: "done" });
   } catch {
     await firebase
@@ -129,7 +128,6 @@ export const updateMasterPassword = async (
 export const updateSecret = async (
   newSecret: string,
   password: string,
-  currentEncryptor: Encryptor,
   operationStatusCallback: (
     updateType: "previous" | "new",
     update: { msg?: string; status: "done" | "failed" | "warning" | "ongoing" }
@@ -177,7 +175,7 @@ export const updateSecret = async (
   const newEncryptor = new Encryptor(email, password);
   newEncryptor.secret = newSecret;
   try {
-    await vault.reEncryptData(currentEncryptor, newEncryptor);
+    await vault.reEncryptData(newEncryptor);
     operationStatusCallback("previous", { status: "done" });
   } catch {
     await firebase
@@ -189,8 +187,8 @@ export const updateSecret = async (
   await firebase
     .deleteBackup()
     .catch(() => console.log("cloud backup is not removed"));
-  currentEncryptor.secret = newSecret;
   operationStatusCallback("new", { msg: "Done!", status: "done" });
+  newEncryptor.saveSecret();
   return newEncryptor;
 };
 

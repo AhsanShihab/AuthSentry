@@ -5,8 +5,6 @@ import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
 import MasterPasswordRegistrationInput from "../Common/MasterPasswordRegistrationInput";
 import { CheckIcon, CrossIcon, ExclaimationIcon } from "../Common/Icons";
-import { useVault } from "../../contexts/vault/provider";
-import { VaultActionType } from "../../contexts/vault/enums";
 import { updateMasterPassword } from "../../services/authentication";
 
 function ChangeMasterPasswordModal({
@@ -16,7 +14,6 @@ function ChangeMasterPasswordModal({
   show: boolean;
   closeModal: () => void;
 }) {
-  const [vault, vaultDispatch] = useVault();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
@@ -58,28 +55,17 @@ function ChangeMasterPasswordModal({
         return newState;
       });
     };
-
-    updateMasterPassword(
-      newPassword,
-      currentPassword,
-      vault.encryptor!,
-      operationStatusUpdateCallback
-    )
-      .then((newEncryptor) => {
-        if (newEncryptor) {
-          vaultDispatch({
-            type: VaultActionType.UPDATE_ENCRYPTOR,
-            payload: {
-              encryptor: newEncryptor!,
-            },
-          });
-        }
-        setIsRunningUpdate(false);
-      })
-      .catch((err) => {
-        alert("Something went wrong! " + err.message);
-        setIsRunningUpdate(false);
-      });
+    try {
+      await updateMasterPassword(
+        newPassword,
+        currentPassword,
+        operationStatusUpdateCallback
+      );
+      setIsRunningUpdate(false);
+    } catch (err: any) {
+      alert("Something went wrong! " + err.message);
+      setIsRunningUpdate(false);
+    }
   };
 
   const isReady =

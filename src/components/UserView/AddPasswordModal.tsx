@@ -20,7 +20,7 @@ function AddPasswordModal({
   isOpen: boolean;
   hideModal: () => void;
 }) {
-  const [vault, vaultDispatch] = useVault();
+  const [, vaultDispatch] = useVault();
   const [name, setName] = useState("");
   const [type, setType] = useState<DataType>(DataType.Credentails);
   const [note, setNote] = useState("");
@@ -85,7 +85,7 @@ function AddPasswordModal({
     if (submitData.password) {
       submitData.passwordUpdatedAt = Date.now();
     }
-    const data = await vaultService.addVaultItem(submitData, vault.encryptor!);
+    const data = await vaultService.addVaultItem(submitData);
     vaultDispatch({
       type: VaultActionType.ADD_NEW_VAULT_ITEM,
       payload: data,

@@ -32,8 +32,11 @@ export class Encryptor {
   }
 
   set secret(value: string) {
-    secureLocalStorage.setItem(this.getStorageKeyForSecret(), value);
     this._secret = value;
+  }
+
+  saveSecret() {
+    secureLocalStorage.setItem(this.getStorageKeyForSecret(), this._secret);
   }
 
   hashValue = async (value: string): Promise<string> => {

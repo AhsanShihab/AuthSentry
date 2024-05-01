@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -28,7 +28,7 @@ import VaultLoader from "./VaultLoader";
 
 function Home() {
   const [, authStateDispatch] = useAuth();
-  const [vault, vaultDispatch] = useVault();
+  const [, vaultDispatch] = useVault();
   const [showAddNewModal, setShowAddNewModal] = useState(false);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [showMasterPasswordUpdateModal, setShowMasterPasswordUpdateModal] =
@@ -36,17 +36,15 @@ function Home() {
   const [showSecretChangeModal, setShowSecretChangeModal] = useState(false);
 
   const refreshList = async () => {
-    const encryptor = vault.encryptor!;
     vaultDispatch({
       type: VaultActionType.START_LOADING_VAULT,
     });
 
-    for await (let item of vaultService.listVaultItemsGenerator(encryptor)) {
+    for await (let item of vaultService.listVaultItemsGenerator()) {
       vaultDispatch({
         type: VaultActionType.LOAD_ITEMS_IN_BATCH,
         payload: {
           items: item,
-          encryptor: encryptor,
         },
       });
     }
@@ -58,15 +56,16 @@ function Home() {
     });
   };
 
-  const signOut = useCallback(async () => {
-    await logOut();
-    vaultDispatch({
-      type: VaultActionType.CLEAR_STATE,
-    });
+  const signOut = () => {
+    logOut();
     authStateDispatch({
       type: AuthActionType.LOGOUT_USER,
     });
-  }, [vaultDispatch, authStateDispatch]);
+    vaultDispatch({
+      type: VaultActionType.CLEAR_STATE,
+    });
+
+  };
 
   const handleSecretChange = async () => {
     setShowSecretChangeModal(true);

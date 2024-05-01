@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
@@ -31,7 +31,10 @@ function VaultLoader() {
   const [secretAskingMessage, setSecretAskingMessage] = useState("");
   const [secret, setSecret] = useState("");
 
-  const loadVault = useCallback(async () => {
+  const loadVault = async () => {
+    vaultDispatch({
+      type: VaultActionType.START_LOADING_VAULT,
+    });
     setShowSecretAskModal(false);
     const user = auth.user!.userInfo;
     const encryptor = new Encryptor(user.email, user.password);
@@ -45,15 +48,15 @@ function VaultLoader() {
     } else if (secret) {
       // asked the user for a secret input, so let's use the latest secret
       encryptor.secret = secret;
+      encryptor.saveSecret();
     }
 
     try {
-      for await (let item of vaultService.listVaultItemsGenerator(encryptor)) {
+      for await (let item of vaultService.listVaultItemsGenerator()) {
         vaultDispatch({
           type: VaultActionType.LOAD_ITEMS_IN_BATCH,
           payload: {
             items: item,
-            encryptor: encryptor,
           },
         });
       }
@@ -86,11 +89,12 @@ function VaultLoader() {
         return;
       }
     }
-  }, [auth.user, secret, vaultDispatch]);
+  };
 
   useEffect(() => {
     loadVault();
-  }, [auth.user?.userInfo, loadVault]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth.user, auth.user?.userInfo]);
 
   return (
     <Modal show={showSecretAskModal}>

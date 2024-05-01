@@ -39,12 +39,9 @@ export function vaultReducer(
       const updatedList = state.items.filter((item) => item.id !== id);
       return { ...state, items: updatedList };
     }
-    case VaultActionType.UPDATE_ENCRYPTOR: {
-      return { ...state, encryptor: action.payload.encryptor };
-    }
 
     case VaultActionType.CLEAR_STATE: {
-      return { items: [], isLoading: false, encryptor: undefined };
+      return { items: [], isLoading: false };
     }
 
     default:

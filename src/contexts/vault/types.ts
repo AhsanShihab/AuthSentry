@@ -1,4 +1,3 @@
-import { Encryptor } from "../../services/encryption";
 import { VaultActionType } from "./enums";
 
 export enum DataType {
@@ -24,7 +23,6 @@ export interface IVaultItemData extends IVaultItemAddData {
 
 export interface IVaultState {
   isLoading: boolean;
-  encryptor?: Encryptor;
   items: IVaultItemData[];
 }
 
@@ -62,16 +60,8 @@ type VaultItemDeleteAction = {
   };
 };
 
-type UpdateEncryptorAction = {
-  type: VaultActionType.UPDATE_ENCRYPTOR;
-  payload: {
-    encryptor: Encryptor;
-  };
-};
-
 type ClearStateAction = {
   type: VaultActionType.CLEAR_STATE;
-  payload?: undefined;
 };
 
 export type IVaultAction =
@@ -81,5 +71,4 @@ export type IVaultAction =
   | VaultItemAddAction
   | VaultItemUpdateAction
   | VaultItemDeleteAction
-  | UpdateEncryptorAction
   | ClearStateAction;

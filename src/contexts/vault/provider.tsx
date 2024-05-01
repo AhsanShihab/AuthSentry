@@ -5,7 +5,6 @@ import { IVaultState } from "./types";
 
 const initialState: IVaultState = {
   isLoading: true,
-  encryptor: undefined,
   items: [],
 };
 
