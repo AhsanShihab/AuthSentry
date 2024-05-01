@@ -8,7 +8,6 @@ import { Encryptor, InvalidEncryptorError } from "../../services/encryption";
 import * as vaultService from "../../services/vault";
 import { useVault } from "../../contexts/vault/provider";
 import { VaultActionType } from "../../contexts/vault/enums";
-import { migrateDatabaseFromCredentialsToVault } from "../../services/firebase";
 
 enum SecretAskingCase {
   NOT_SAVED_LOCALLY = 1,
@@ -49,7 +48,6 @@ function VaultLoader() {
     }
 
     try {
-      await migrateDatabaseFromCredentialsToVault();
       for await (let item of vaultService.listVaultItemsGenerator(encryptor)) {
         vaultDispatch({
           type: VaultActionType.LOAD_ITEMS_IN_BATCH,

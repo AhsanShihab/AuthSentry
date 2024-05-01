@@ -258,20 +258,3 @@ export async function updateMetaInfo(field: string, value: any) {
     { [field]: value }
   );
 }
-
-
-export async function migrateDatabaseFromCredentialsToVault() {
-  const { data } = await axios.get(
-    `${databaseURL}/users/${getCurrentUserId()}/credentials.json?auth=${currentIdToken}`
-  );
-  if (!data) {
-    return;
-  }
-  await axios.put(
-    `${databaseURL}/users/${getCurrentUserId()}/vault.json?auth=${currentIdToken}`,
-    data
-  );
-  await axios.delete(
-    `${databaseURL}/users/${getCurrentUserId()}/credentials.json?auth=${currentIdToken}`
-  );
-}
