@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Form from "react-bootstrap/Form";
 import { CheckIcon, CrossIcon } from "./Icons";
 
@@ -18,6 +19,14 @@ function MasterPasswordRegistrationInput({
   onChange: (value: string) => void;
   onValidityChange?: (isValid: boolean) => void;
 }) {
+  const [validation, setValidation] = useState({
+    passwordLengthSatisfied: false,
+    hasCapitalLetter: false,
+    hasLowercaseLetter: false,
+    hasNumericalChar: false,
+    hasSpecialCharacter: false,
+  });
+  const [isPassValid, setIsPassValid] = useState(false);
   const passwordLengthSatisfied = (v: string) => v.length >= 12;
   const hasCapitalLetter = (v: string) => v !== v.toLowerCase();
   const hasLowercaseLetter = (v: string) => v !== v.toUpperCase();
@@ -25,19 +34,36 @@ function MasterPasswordRegistrationInput({
   const hasSpecialCharacter = (v: string) =>
     /[ `!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?~]/.test(v);
 
-  const matchedAllRequirements = (v: string) =>
-    passwordLengthSatisfied(v) &&
-    hasCapitalLetter(v) &&
-    hasLowercaseLetter(v) &&
-    hasNumericalChar(v) &&
-    hasSpecialCharacter(v);
+  const validatePasswordRequirements = (v: string) => {
+    return {
+      passwordLengthSatisfied: passwordLengthSatisfied(v),
+      hasCapitalLetter: hasCapitalLetter(v),
+      hasLowercaseLetter: hasLowercaseLetter(v),
+      hasNumericalChar: hasNumericalChar(v),
+      hasSpecialCharacter: hasSpecialCharacter(v),
+    };
+  };
+
+  const hasPassedAllValidation = (val: { [k: string]: boolean }) => {
+    for (let k of Object.keys(val)) {
+      if (!val[k]) {
+        return false;
+      }
+    }
+    return true;
+  };
 
   const handleOnChange = (newValue: string) => {
-    const hasValidityChanged =
-      matchedAllRequirements(value) !== matchedAllRequirements(newValue);
+    const oldPassVal = validatePasswordRequirements(value);
+    const newPassVal = validatePasswordRequirements(newValue);
+    const isOldValueValid = hasPassedAllValidation(oldPassVal);
+    const isNewValueValid = hasPassedAllValidation(newPassVal);
+    setValidation(newPassVal);
+    setIsPassValid(isNewValueValid);
+    const hasValidityChanged = isOldValueValid !== isNewValueValid;
     onChange(newValue);
     if (hasValidityChanged && onValidityChange) {
-      onValidityChange(matchedAllRequirements(newValue));
+      onValidityChange(isNewValueValid);
     }
   };
 
@@ -48,63 +74,67 @@ function MasterPasswordRegistrationInput({
         type="password"
         placeholder={placeholder}
         value={value}
-        isInvalid={Boolean(value) && !matchedAllRequirements(value)}
-        isValid={matchedAllRequirements(value)}
+        isInvalid={Boolean(value) && !isPassValid}
+        isValid={isPassValid}
         onChange={(e) => handleOnChange(e.target.value)}
       />
-      {!value ? null : matchedAllRequirements(value) ? (
+      {!value ? null : isPassValid ? (
         <Form.Control.Feedback>
-          <CheckIcon /> Looks good. I hope it's not your pet's name!
+          <CheckIcon /> Looks good. Make sure it's not easily guessable!
         </Form.Control.Feedback>
       ) : (
         <>
           <Form.Text
             className={`d-block text-${
-              passwordLengthSatisfied(value) ? "success" : "danger"
+              validation.passwordLengthSatisfied ? "success" : "danger"
             }`}
           >
             <span className="me-3">
-              {passwordLengthSatisfied(value) ? <CheckIcon /> : <CrossIcon />}
+              {validation.passwordLengthSatisfied ? (
+                <CheckIcon />
+              ) : (
+                <CrossIcon />
+              )}
             </span>{" "}
             Should be at least 12 characters
           </Form.Text>
           <Form.Text
             className={`d-block text-${
-              hasCapitalLetter(value) ? "success" : "danger"
+              validation.hasCapitalLetter ? "success" : "danger"
             }`}
           >
             <span className="me-3">
-              {hasCapitalLetter(value) ? <CheckIcon /> : <CrossIcon />}
+              {validation.hasCapitalLetter ? <CheckIcon /> : <CrossIcon />}
             </span>{" "}
             Should contain at least 1 capital letter
           </Form.Text>
           <Form.Text
             className={`d-block text-${
-              hasLowercaseLetter(value) ? "success" : "danger"
+              validation.hasLowercaseLetter ? "success" : "danger"
             }`}
           >
             <span className="me-3">
-              {hasLowercaseLetter(value) ? <CheckIcon /> : <CrossIcon />}
+              {validation.hasLowercaseLetter ? <CheckIcon /> : <CrossIcon />}
             </span>{" "}
             Should contain at least 1 lowercase letter
           </Form.Text>
           <Form.Text
             className={`d-block text-${
-              hasNumericalChar(value) ? "success" : "danger"
+              validation.hasNumericalChar ? "success" : "danger"
             }`}
           >
             <span className="me-3">
-              {hasNumericalChar(value) ? <CheckIcon /> : <CrossIcon />}
+              {validation.hasNumericalChar ? <CheckIcon /> : <CrossIcon />}
             </span>{" "}
             Should contain at least 1 numerical character
           </Form.Text>
           <Form.Text
             className={`d-block text-${
-              hasSpecialCharacter(value) ? "success" : "danger"
+              validation.hasSpecialCharacter ? "success" : "danger"
             }`}
           >
             <span className="me-3">
-              {hasSpecialCharacter(value) ? <CheckIcon /> : <CrossIcon />}
+              {validation.hasSpecialCharacter ? <CheckIcon /> : <CrossIcon />}
             </span>{" "}
             Should contain at least 1 specialcase character
           </Form.Text>
