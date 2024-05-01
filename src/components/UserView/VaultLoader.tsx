@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
@@ -32,12 +32,12 @@ function VaultLoader() {
   const [secretAskingMessage, setSecretAskingMessage] = useState("");
   const [secret, setSecret] = useState("");
 
-  const loadVault = async () => {
+  const loadVault = useCallback(async () => {
     setShowSecretAskModal(false);
     const user = auth.user!.userInfo;
     const encryptor = new Encryptor(user.email, user.password);
     if (!encryptor.secret && !secret) {
-      // encryptor were unable to load the secret from locally saved value and have not asked the user the secret yet. open secret asking modal
+      // encryptor was unable to load the secret from locally saved value and have not asked the user the secret yet. open secret asking modal
       setSecretAskingMessage(
         SECRET_ASKING_MESSAGE[SecretAskingCase.NOT_SAVED_LOCALLY]
       );
@@ -88,11 +88,11 @@ function VaultLoader() {
         return;
       }
     }
-  };
+  }, [auth.user, secret, vaultDispatch]);
 
   useEffect(() => {
     loadVault();
-  }, [auth.user?.userInfo]);
+  }, [auth.user?.userInfo, loadVault]);
 
   return (
     <Modal show={showSecretAskModal}>
