@@ -11,13 +11,17 @@ function shuffleArray(array: string[]): string[] {
   return array;
 }
 
-export function generateRandomPassword(length: number): string {
+export function generateRandomPassword(
+  length: number,
+  includeSpecialChars = true
+): string {
   const lowercase = "abcdefghijklmnopqrstuvwxyz";
   const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   const numbers = "0123456789";
   const specialChars = "!@#$%^&*()-_=+";
 
-  const charset = lowercase + uppercase + numbers + specialChars;
+  const charset =
+    lowercase + uppercase + numbers + includeSpecialChars ? specialChars : "";
 
   let passwordArray = new Array(length);
 
@@ -25,7 +29,9 @@ export function generateRandomPassword(length: number): string {
   passwordArray.push(getRandomChar(lowercase));
   passwordArray.push(getRandomChar(uppercase));
   passwordArray.push(getRandomChar(numbers));
-  passwordArray.push(getRandomChar(specialChars));
+  if (includeSpecialChars) {
+    passwordArray.push(getRandomChar(specialChars));
+  }
 
   // Fill the remaining characters
   for (let i = 4; i < length; i++) {
