@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Form from "react-bootstrap/Form";
 import { CheckIcon, CrossIcon } from "./Icons";
 
@@ -19,6 +19,8 @@ function MasterPasswordRegistrationInput({
   onChange: (value: string) => void;
   onValidityChange?: (isValid: boolean) => void;
 }) {
+  const [isCapsLockOn, setIsCapsLockOn] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const [validation, setValidation] = useState({
     passwordLengthSatisfied: false,
     hasCapitalLetter: false,
@@ -67,6 +69,19 @@ function MasterPasswordRegistrationInput({
     }
   };
 
+  useEffect(() => {
+    const onKeyChange = (event: KeyboardEvent) => {
+      setIsCapsLockOn((state) => event.getModifierState?.("CapsLock") ?? state);
+    };
+
+    document.addEventListener("keydown", onKeyChange);
+    document.addEventListener("keyup", onKeyChange);
+    return () => {
+      document.removeEventListener("keydown", onKeyChange);
+      document.removeEventListener("keyup", onKeyChange);
+    };
+  }, []);
+
   return (
     <Form.Group className={className || ""}>
       <Form.Label>{label}</Form.Label>
@@ -77,7 +92,12 @@ function MasterPasswordRegistrationInput({
         isInvalid={Boolean(value) && !isPassValid}
         isValid={isPassValid}
         onChange={(e) => handleOnChange(e.target.value)}
+        onBlur={() => setIsFocused(false)}
+        onFocus={() => setIsFocused(true)}
       />
+      {isCapsLockOn && isFocused && (
+        <Form.Text className="d-block mb-3">CapsLock is on</Form.Text>
+      )}
       {!value ? null : isPassValid ? (
         <Form.Control.Feedback>
           <CheckIcon /> Looks good. Make sure it's not easily guessable!
