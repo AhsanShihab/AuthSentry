@@ -2,11 +2,10 @@ import { useState } from "react";
 import Accordion from "react-bootstrap/Accordion";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import Badge from 'react-bootstrap/Badge';
-
-import { CheckIcon, CopyButtonIcon } from "../Common/Icons";
+import Badge from "react-bootstrap/Badge";
 import { generateRandomPassword } from "../../services/password_generator";
 import { deleteVaultItem, updateVaultItem } from "../../services/vault";
+import CopyButton from "../Common/CopyButton";
 import ConfirmationModal from "../Common/ConfirmationModal";
 import {
   DataType,
@@ -30,19 +29,13 @@ function VaultItem({ item }: { item: IVaultItemData }) {
   const [passwordLength, setPasswordLength] = useState(
     item.password.length || 32
   );
-  const [copyBtnType, setCopyBtnType] = useState("Copy");
+
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const changePasswordLength = (percent: string) => {
     const percentNumber = Number.parseInt(percent);
     setPasswordLength(percentNumber);
     setPassword(generateRandomPassword(percentNumber));
-  };
-
-  const handleClickOnPasswordCopy = () => {
-    navigator.clipboard.writeText(password);
-    setCopyBtnType("Copied");
-    setTimeout(() => setCopyBtnType("Copy"), 5000);
   };
 
   const handleNote = (value: string) => {
@@ -97,7 +90,7 @@ function VaultItem({ item }: { item: IVaultItemData }) {
     const lastUpdatedAt = item.passwordUpdatedAt;
     const threeMonths = 3 * 30 * 24 * 60 * 60 * 1000;
     return timeNow - lastUpdatedAt > threeMonths;
-  }
+  };
 
   const isReadyToUpdate =
     Boolean(name) &&
@@ -154,30 +147,32 @@ function VaultItem({ item }: { item: IVaultItemData }) {
                   <tr>
                     <td className="pt-2 pe-2 border-0">Email</td>
                     <td className="pt-2 pe-2 border-0">:</td>
-                    <td className="pt-2 border-0">{email}</td>
+                    <td className="pt-2 border-0">
+                      {email}{" "}
+                      {email && (
+                        <CopyButton className="ms-2 border-0" value={email} />
+                      )}
+                    </td>
                   </tr>
                   <tr>
                     <td className="pt-2 pe-2 border-0">Username</td>
                     <td className="pt-2 pe-2 border-0">:</td>
-                    <td className="pt-2 border-0">{username}</td>
+                    <td className="pt-2 border-0">
+                      {username}{" "}
+                      {username && (
+                        <CopyButton
+                          className="ms-2 border-0"
+                          value={username}
+                        />
+                      )}
+                    </td>
                   </tr>
                   <tr>
                     <td className="pt-2 pe-2 border-0">password</td>
                     <td className="pt-2 pe-2 border-0">:</td>
                     <td className="pt-2 border-0">
                       *********{" "}
-                      <Button
-                        className="ms-2 border-0"
-                        variant="outline-secondary"
-                        size="sm"
-                        onClick={handleClickOnPasswordCopy}
-                      >
-                        {copyBtnType === "Copied" ? (
-                          <CheckIcon />
-                        ) : (
-                          <CopyButtonIcon />
-                        )}
-                      </Button>
+                      <CopyButton className="ms-2 border-0" value={password} />
                     </td>
                   </tr>
                   <tr>
@@ -318,18 +313,7 @@ function VaultItem({ item }: { item: IVaultItemData }) {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                       />{" "}
-                      <Button
-                        className="ms-2 border-0"
-                        variant="outline-secondary"
-                        size="sm"
-                        onClick={handleClickOnPasswordCopy}
-                      >
-                        {copyBtnType === "Copied" ? (
-                          <CheckIcon />
-                        ) : (
-                          <CopyButtonIcon />
-                        )}
-                      </Button>
+                      <CopyButton className="ms-2 border-0" value={password} />
                     </td>
                   </tr>
                   <tr>
