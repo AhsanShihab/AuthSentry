@@ -16,7 +16,7 @@ function DownloadModal({
   show: boolean;
   toggle: () => void;
 }) {
-  const [vault,] = useVault();
+  const [vault] = useVault();
   const [downloadUnencrypted, setDownloadUnencrypted] = useState(false);
   const [password, setPassword] = useState("");
   const [isPasswordIncorrect, setIsPasswordIncorrect] = useState(false);
@@ -26,7 +26,7 @@ function DownloadModal({
     setPassword("");
     setDownloadUnencrypted(false);
     toggle();
-  }
+  };
 
   const downloadFile = async () => {
     const isPasswordValid = await authentication.verifyPassword(password);
@@ -37,7 +37,7 @@ function DownloadModal({
     const vaultItemList = downloadUnencrypted
       ? vault.items
       : await vaultService.listEncryptedVaultItems();
-    const filteredList = vaultItemList.filter(item => item.type === type);
+    const filteredList = vaultItemList.filter((item) => item.type === type);
 
     // create file in browser
     const fileName = `AuthSentry - list of ${type}`;

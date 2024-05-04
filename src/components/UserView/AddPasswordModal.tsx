@@ -12,13 +12,16 @@ import { VaultActionType } from "../../contexts/vault/enums";
 import { generateRandomPassword } from "../../services/password_generator";
 import * as vaultService from "../../services/vault";
 import { NOTE_CHARACTER_LIMIT } from "../../constants";
+import { InvalidEncryptorError } from "../../services/encryption";
 
 function AddPasswordModal({
   isOpen,
   hideModal,
+  onInvalidEncryptorError,
 }: {
   isOpen: boolean;
   hideModal: () => void;
+  onInvalidEncryptorError: () => void;
 }) {
   const [, vaultDispatch] = useVault();
   const [name, setName] = useState("");
@@ -66,31 +69,41 @@ function AddPasswordModal({
   };
 
   const handleAdd = async () => {
-    const submitData: IVaultItemAddData = {
-      type,
-      name,
-      note: [DataType.Note, DataType.Both].includes(type) ? note : "",
-      siteUrl: [DataType.Credentails, DataType.Both].includes(type)
-        ? siteUrl
-        : "",
-      email: [DataType.Credentails, DataType.Both].includes(type) ? email : "",
-      username: [DataType.Credentails, DataType.Both].includes(type)
-        ? username
-        : "",
-      password: [DataType.Credentails, DataType.Both].includes(type)
-        ? password
-        : "",
-      passwordUpdatedAt: null,
-    };
-    if (submitData.password) {
-      submitData.passwordUpdatedAt = Date.now();
+    try {
+      const submitData: IVaultItemAddData = {
+        type,
+        name,
+        note: [DataType.Note, DataType.Both].includes(type) ? note : "",
+        siteUrl: [DataType.Credentails, DataType.Both].includes(type)
+          ? siteUrl
+          : "",
+        email: [DataType.Credentails, DataType.Both].includes(type)
+          ? email
+          : "",
+        username: [DataType.Credentails, DataType.Both].includes(type)
+          ? username
+          : "",
+        password: [DataType.Credentails, DataType.Both].includes(type)
+          ? password
+          : "",
+        passwordUpdatedAt: null,
+      };
+      if (submitData.password) {
+        submitData.passwordUpdatedAt = Date.now();
+      }
+      const data = await vaultService.addVaultItem(submitData);
+      vaultDispatch({
+        type: VaultActionType.ADD_NEW_VAULT_ITEM,
+        payload: data,
+      });
+      closeModal();
+    } catch (err) {
+      if (err instanceof InvalidEncryptorError) {
+        onInvalidEncryptorError();
+      } else {
+        throw err;
+      }
     }
-    const data = await vaultService.addVaultItem(submitData);
-    vaultDispatch({
-      type: VaultActionType.ADD_NEW_VAULT_ITEM,
-      payload: data,
-    });
-    closeModal();
   };
   const isReadyToAdd =
     Boolean(name) &&

@@ -1,4 +1,4 @@
-import { Encryptor } from "./encryption";
+import { Encryptor, InvalidEncryptorError } from "./encryption";
 import * as firebase from "./firebase";
 import * as vault from "./vault";
 
@@ -6,8 +6,8 @@ export const logIn = async (email: string, password: string) => {
   return await firebase.logIn(email, password);
 };
 
-export const logOut = async () => {
-  await firebase.logOut();
+export const logOut = () => {
+  firebase.logOut();
 };
 
 export const register = async (email: string, password: string) => {
@@ -77,11 +77,17 @@ export const updateMasterPassword = async (
   try {
     await vault.reEncryptData(newEncryptor);
     operationStatusCallback("previous", { status: "done" });
-  } catch {
+  } catch (err) {
     await firebase
       .deleteBackup()
       .catch(() => console.log("cloud backup is not removed"));
     operationStatusCallback("previous", { status: "failed" });
+    if (err instanceof InvalidEncryptorError) {
+      operationStatusCallback("new", {
+        msg: "Your encryption secret may have changed from another session. Please logout and login again to start a new session",
+        status: "warning",
+      });
+    }
     return;
   }
 
@@ -112,7 +118,7 @@ export const updateMasterPassword = async (
 
       // TODO: retry
       operationStatusCallback("new", {
-        msg: "I did not prepare for this. Your data got messed up! I hope you made backup. :(",
+        msg: "Database rollback failed! The old data still exists in the database backup but need to be recovered manually. Please contact the maintainer.",
         status: "warning",
       });
     }
@@ -177,11 +183,17 @@ export const updateSecret = async (
   try {
     await vault.reEncryptData(newEncryptor);
     operationStatusCallback("previous", { status: "done" });
-  } catch {
+  } catch (err) {
     await firebase
       .deleteBackup()
       .catch(() => console.log("cloud backup is not removed"));
     operationStatusCallback("previous", { status: "failed" });
+    if (err instanceof InvalidEncryptorError) {
+      operationStatusCallback("new", {
+        msg: "Your old encryption secret may have changed from another session. Please logout and login again to start a new session",
+        status: "warning",
+      });
+    }
     return;
   }
   await firebase

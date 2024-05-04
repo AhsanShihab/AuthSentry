@@ -4,7 +4,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import Dropdown from "react-bootstrap/Dropdown";
-import { logOut } from "../../services/firebase";
+import { logOut } from "../../services/authentication";
 import * as vaultService from "../../services/vault";
 import {
   DownloadIcon,
@@ -25,6 +25,8 @@ import ChangeSecretModal from "./ChangeSecretModal";
 import VaultItemList from "./VaultItemList";
 import LogoutCountdownTime from "./LogoutCountdownTime";
 import VaultLoader from "./VaultLoader";
+import InvalidEncryptorErrorModal from "./InvalidEncryptorErrorModal";
+import { InvalidEncryptorError } from "../../services/encryption";
 
 function Home() {
   const [, authStateDispatch] = useAuth();
@@ -34,26 +36,40 @@ function Home() {
   const [showMasterPasswordUpdateModal, setShowMasterPasswordUpdateModal] =
     useState(false);
   const [showSecretChangeModal, setShowSecretChangeModal] = useState(false);
+  const [showInvalidEncryptorErrorModal, setShowInvalidEncryptorErrorModal] =
+    useState(false);
+
+  const handleInvalidEncryptorError = () => {
+    setShowInvalidEncryptorErrorModal(true);
+  };
 
   const refreshList = async () => {
-    vaultDispatch({
-      type: VaultActionType.START_LOADING_VAULT,
-    });
+    try {
+      vaultDispatch({
+        type: VaultActionType.START_LOADING_VAULT,
+      });
 
-    for await (let item of vaultService.listVaultItemsGenerator()) {
+      for await (let item of vaultService.listVaultItemsGenerator()) {
+        vaultDispatch({
+          type: VaultActionType.LOAD_ITEMS_IN_BATCH,
+          payload: {
+            items: item,
+          },
+        });
+      }
       vaultDispatch({
         type: VaultActionType.LOAD_ITEMS_IN_BATCH,
         payload: {
-          items: item,
+          isLoading: false,
         },
       });
+    } catch (err) {
+      if (err instanceof InvalidEncryptorError) {
+        handleInvalidEncryptorError();
+      } else {
+        throw err;
+      }
     }
-    vaultDispatch({
-      type: VaultActionType.LOAD_ITEMS_IN_BATCH,
-      payload: {
-        isLoading: false,
-      },
-    });
   };
 
   const signOut = () => {
@@ -64,7 +80,6 @@ function Home() {
     vaultDispatch({
       type: VaultActionType.CLEAR_STATE,
     });
-
   };
 
   const handleSecretChange = async () => {
@@ -153,6 +168,7 @@ function Home() {
           <AddPasswordModal
             isOpen={showAddNewModal}
             hideModal={hidePasswordAddModal}
+            onInvalidEncryptorError={handleInvalidEncryptorError}
           />
           <DownloadModal
             show={showDownloadModal}
@@ -165,6 +181,10 @@ function Home() {
           <ChangeSecretModal
             show={showSecretChangeModal}
             closeModal={() => setShowSecretChangeModal(false)}
+          />
+          <InvalidEncryptorErrorModal
+            show={showInvalidEncryptorErrorModal}
+            signout={signOut}
           />
         </Col>
       </Row>

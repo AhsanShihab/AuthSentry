@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { AUTO_LOGOUT_TIMEOUT_SECONDS } from "../../constants";
 import { useAuth } from "../../contexts/auth/provider";
-import { logOut } from "../../services/firebase";
+import { logOut } from "../../services/authentication";
 import { useVault } from "../../contexts/vault/provider";
 import { VaultActionType } from "../../contexts/vault/enums";
 import { AuthActionType } from "../../contexts/auth/enums";
@@ -13,8 +13,8 @@ function LogoutCountdownTime() {
     AUTO_LOGOUT_TIMEOUT_SECONDS
   );
 
-  const signOut = useCallback(async () => {
-    await logOut();
+  const signOut = useCallback(() => {
+    logOut();
     vaultDispatch({
       type: VaultActionType.CLEAR_STATE,
     });
