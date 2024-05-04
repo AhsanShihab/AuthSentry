@@ -29,7 +29,7 @@ function VaultItem({ item }: { item: IVaultItemData }) {
   const [passwordLength, setPasswordLength] = useState(
     item.password.length || 32
   );
-
+  const [showNote, setShowNote] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const changePasswordLength = (percent: string) => {
@@ -92,6 +92,10 @@ function VaultItem({ item }: { item: IVaultItemData }) {
     return timeNow - lastUpdatedAt > threeMonths;
   };
 
+  const toggleNoteVisibility = () => {
+    setShowNote((state) => !state);
+  };
+
   const isReadyToUpdate =
     Boolean(name) &&
     (type === DataType.Credentails
@@ -130,7 +134,18 @@ function VaultItem({ item }: { item: IVaultItemData }) {
                     className="pt-2 border-0"
                     style={{ whiteSpace: "pre-line" }}
                   >
-                    {note}
+                    {showNote ? (
+                      <>
+                        {note} <br />
+                      </>
+                    ) : null}
+                    <Button
+                      className="ms-0 p-0 text-decoration-none"
+                      onClick={toggleNoteVisibility}
+                      variant="link"
+                    >
+                      {showNote ? "Hide" : "Show"}
+                    </Button>
                   </td>
                 </tr>
               )}
