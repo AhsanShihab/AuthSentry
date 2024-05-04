@@ -1,5 +1,9 @@
 import { META_INFO_ENCRYPTION_KEY_HASH_FIELD } from "../constants";
-import { IVaultItemAddData, IVaultItemData } from "../contexts/vault/types";
+import {
+  IEncryptedData,
+  IVaultItemAddData,
+  IVaultItemData,
+} from "../contexts/vault/types";
 import { Encryptor, InvalidEncryptorError } from "./encryption";
 import * as firebase from "./firebase";
 
@@ -32,11 +36,9 @@ const getCurrentEncryptor = async () => {
     throw new InvalidEncryptorError();
   }
   return encryptor;
-}
+};
 
-const decryptData = async (
-  data: IVaultItemData
-): Promise<IVaultItemData> => {
+const decryptData = async (data: IVaultItemData): Promise<IVaultItemData> => {
   const encryptor = await getCurrentEncryptor();
   const [note, email, password, username, siteUrl] = await Promise.all([
     data.note ? encryptor.decrypt(data.note) : Promise.resolve(""),
@@ -55,13 +57,14 @@ const decryptData = async (
     password,
     username,
     siteUrl,
+    encryptorVersion: data.encryptorVersion,
   };
 };
 
 const encryptData = async (
   data: IVaultItemAddData,
   customEncryptor?: Encryptor
-): Promise<IVaultItemAddData> => {
+): Promise<IEncryptedData> => {
   const encryptor = customEncryptor
     ? customEncryptor
     : await getCurrentEncryptor();
@@ -81,21 +84,26 @@ const encryptData = async (
     password,
     username,
     siteUrl,
+    encryptorVersion: "1",
   };
 };
 
 export const addVaultItem = async (
-  data: IVaultItemAddData,
+  data: IVaultItemAddData
 ): Promise<IVaultItemData> => {
   const encryptedData = await encryptData(data);
   const docReference = await firebase.addVaultItem(encryptedData);
 
-  return { ...data, id: docReference.key! };
+  return {
+    ...data,
+    encryptorVersion: encryptedData.encryptorVersion,
+    id: docReference.key!,
+  };
 };
 
 export const updateVaultItem = async (
   docId: string,
-  data: IVaultItemAddData,
+  data: IVaultItemAddData
 ): Promise<void> => {
   const encryptedData = await encryptData(data);
   await firebase.updateVaultItem(docId, encryptedData);
@@ -107,7 +115,7 @@ export const deleteVaultItem = async (docId: string): Promise<void> => {
 
 export async function* listVaultItemsGenerator() {
   const encryptedVaultItemList = await firebase.listVaultItems();
-  encryptedVaultItemList.sort((a, b) => a.name > b.name ? 1 : -1);
+  encryptedVaultItemList.sort((a, b) => (a.name > b.name ? 1 : -1));
   while (encryptedVaultItemList.length) {
     const batch = encryptedVaultItemList.splice(0, 10);
     const resultPromise = batch.map((item) => decryptData(item));
@@ -115,8 +123,7 @@ export async function* listVaultItemsGenerator() {
   }
 }
 
-const listVaultItems = async (
-): Promise<IVaultItemData[]> => {
+const listVaultItems = async (): Promise<IVaultItemData[]> => {
   const encryptedVaultItemList = await firebase.listVaultItems();
   const decryptedListPromise = encryptedVaultItemList.map((data) =>
     decryptData(data)
@@ -130,9 +137,7 @@ export const listEncryptedVaultItems = async (): Promise<IVaultItemData[]> => {
   return encryptedVaultItemList;
 };
 
-export const reEncryptData = async (
-  newEncryptor: Encryptor
-) => {
+export const reEncryptData = async (newEncryptor: Encryptor) => {
   const vaultItemList = await listVaultItems();
   const reEncryptedDataPromise = vaultItemList.map(async (item) => {
     const { id, ...data } = item;

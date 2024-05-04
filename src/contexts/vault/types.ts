@@ -17,7 +17,11 @@ export interface IVaultItemAddData {
   passwordUpdatedAt: number | null;
 }
 
-export interface IVaultItemData extends IVaultItemAddData {
+export interface IEncryptedData extends IVaultItemAddData {
+  encryptorVersion: string;
+}
+
+export interface IVaultItemData extends IEncryptedData {
   id: string;
 }
 
