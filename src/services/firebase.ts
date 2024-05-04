@@ -1,16 +1,12 @@
 /*
-Q:  Why am I making direct REST api calls to firebase instead of using the firebase sdk package?
-A:  I first used the SDK. But then I noticed the app got injected with some google tracker,
-    of which I had no idea. For a security focused app, like a password manager,
-    having an unknown tracker is not acceptable. So I removed the package, and
-    reimplemented it using the direct REST API calls.
+Q:  Why am I using REST API instead of the firebase sdk package?
+A:  Firebase SDK was injecting the app with some google trackers. To keep this app tracker free,
+    I removed the SDK and reimplemented them using the REST API endpoints.
 */
 
 import axios, { AxiosError } from "axios";
 import { IVaultItemData } from "../contexts/vault/types";
 import { META_INFO_ENCRYPTION_KEY_HASH_FIELD } from "../constants";
-import firebaseConfigDev from "../config/firebase_config_dev.json";
-import firebaseConfigProd from "../config/firebase_config_prod.json";
 
 interface FirebaseErrorResponse {
   error?: { errors?: { message: string }[] };
@@ -24,19 +20,13 @@ class FirebaseStyleError extends Error {
   }
 }
 
-const firebaseConfig =
-  process.env.NODE_ENV === "production"
-    ? firebaseConfigProd
-    : firebaseConfigDev;
-
 const FIREBASE_AUTH_ENDPOINT = "https://identitytoolkit.googleapis.com/v1";
-const apiKey = firebaseConfig.apiKey;
-const databaseURL = firebaseConfig.databaseURL;
+const apiKey = process.env.REACT_APP_FIREBASE_API_KEY;
+const databaseURL = process.env.REACT_APP_FIREBASE_REALTIME_DATABASE_URL;
 
 let currentUserEmail: string | null = null;
 let currentUserPassword: string | null = null;
 let currentIdToken: string | null = null;
-let currentRefreshToken: string | null = null;
 let currentUserId: string | null = null;
 
 const throwFirebaseStyleError = (err: AxiosError) => {
@@ -78,9 +68,8 @@ export async function signUp(email: string, password: string) {
       }
     );
 
-    const { idToken, refreshToken, localId: userId } = res.data;
+    const { idToken, localId: userId } = res.data;
     currentIdToken = idToken;
-    currentRefreshToken = refreshToken;
     currentUserId = userId;
     currentUserEmail = email;
     currentUserPassword = password;
@@ -104,10 +93,9 @@ export async function logIn(email: string, password: string) {
       }
     );
 
-    const { idToken, refreshToken, localId: userId } = res.data;
+    const { idToken, localId: userId } = res.data;
     currentUserEmail = email;
     currentIdToken = idToken;
-    currentRefreshToken = refreshToken;
     currentUserId = userId;
     currentUserPassword = password;
   } catch (err) {
@@ -121,7 +109,6 @@ export async function logIn(email: string, password: string) {
 
 export function logOut() {
   currentIdToken = null;
-  currentRefreshToken = null;
   currentUserId = null;
   currentUserEmail = null;
   currentUserPassword = null;
@@ -141,9 +128,8 @@ export async function updateMasterPassword(newPassword: string) {
     }
   );
 
-  const { idToken, refreshToken } = res.data;
+  const { idToken } = res.data;
   currentIdToken = idToken;
-  currentRefreshToken = refreshToken;
   currentUserPassword = newPassword;
 }
 
