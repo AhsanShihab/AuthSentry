@@ -52,7 +52,7 @@ function Authentication() {
       <Row className="mt-3">
         <Col md={{ offset: 2, span: 8 }}>
           <div className="d-flex flex-row justify-content-center align-items-center mb-3">
-            <img src="/logo192.png" alt="logo" width={116} height={116} />
+            <img src={process.env.PUBLIC_URL + "/logo192.png"} alt="logo" width={116} height={116} />
             <div>
               <h1 className="mt-3">AuthSentry</h1>
               <h5> Your Fortress of Security</h5>

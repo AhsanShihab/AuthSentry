@@ -101,7 +101,7 @@ function Home() {
       <Row className="mt-3">
         <Col md={{ offset: 2, span: 8 }}>
           <div className="d-flex flex-row mt-3 mb-5">
-            <img src="/logo192.png" alt="logo" width={128} height={128} />
+            <img src={process.env.PUBLIC_URL + "/logo192.png"} alt="logo" width={128} height={128} />
             <div>
               <h1 className="mt-3">AuthSentry</h1>
               <h5> Your Fortress of Security</h5>
