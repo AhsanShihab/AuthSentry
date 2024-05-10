@@ -52,6 +52,8 @@ function SignUp({
         setSignUpErrorMsg(
           "Cannot connect to the server. Make sure you are connected to the internet and try again"
         );
+      } else if (err.code === "auth/admin-only") {
+        setSignUpErrorMsg("Signup is restricted by admin");
       } else {
         setSignUpErrorMsg("Something went wrong!");
       }

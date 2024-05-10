@@ -43,6 +43,8 @@ const throwFirebaseStyleError = (err: AxiosError) => {
       firebaseError.code = "auth/invalid-email";
     } else if (errorDetails[0].message === "INVALID_LOGIN_CREDENTIALS") {
       firebaseError.code = "auth/invalid-credential";
+    } else if (errorDetails[0].message === "ADMIN_ONLY_OPERATION") {
+      firebaseError.code = "auth/admin-only";
     }
   }
   throw firebaseError;
