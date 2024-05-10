@@ -31,7 +31,12 @@ function VaultLoader() {
   const [secretAskingMessage, setSecretAskingMessage] = useState("");
   const [secret, setSecret] = useState("");
 
-  const loadVault = async () => {
+  const loadVault = async (
+    event?: React.FormEvent<HTMLFormElement | HTMLButtonElement>
+  ) => {
+    if (event) {
+      event.preventDefault();
+    }
     vaultDispatch({
       type: VaultActionType.START_LOADING_VAULT,
     });
@@ -100,8 +105,8 @@ function VaultLoader() {
     <Modal show={showSecretAskModal}>
       <Modal.Header>Secret</Modal.Header>
       <Modal.Body>
-        <p>{secretAskingMessage}</p>
-        <Form>
+        <Form onSubmit={loadVault}>
+          <p>{secretAskingMessage}</p>
           <EncryptionSecretInput
             className="mb-3"
             onChange={setSecret}

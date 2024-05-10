@@ -119,7 +119,7 @@ function AddPasswordModal({
       </Modal.Header>
       <Modal.Body>
         <Container>
-          <Form>
+          <Form onSubmit={(e) => e.preventDefault()}>
             <Form.Group as={Row} className="mb-3">
               <Form.Label column sm="3" lg="2">
                 Name *

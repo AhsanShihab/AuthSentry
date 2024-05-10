@@ -19,7 +19,7 @@ function VaultItemList() {
     <>
       <Row className="mt-3">
         <Col>
-          <Form>
+          <Form onSubmit={(e) => e.preventDefault()}>
             <Form.Control
               type="text"
               placeholder="Search ..."

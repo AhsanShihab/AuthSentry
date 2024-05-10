@@ -77,7 +77,7 @@ function ChangeMasterPasswordModal({
     <Modal show={show} size="lg" fullscreen="sm-down">
       <Modal.Header>Change Master Password</Modal.Header>
       <Modal.Body>
-        <Form>
+        <Form onSubmit={(e) => e.preventDefault()}>
           <Form.Group className="mb-3">
             <Form.Label>Current password</Form.Label>
             <Form.Control

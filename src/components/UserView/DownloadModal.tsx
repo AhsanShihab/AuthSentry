@@ -65,7 +65,7 @@ function DownloadModal({
     <Modal show={show} onHide={onClose}>
       <Modal.Header>Download</Modal.Header>
       <Modal.Body>
-        <Form className="mb-3">
+        <Form className="mb-3" onSubmit={(e) => e.preventDefault()}>
           <Form.Group className="mb-3">
             <Form.Label>Enter your password</Form.Label>
             <Form.Control

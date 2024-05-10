@@ -71,7 +71,7 @@ function ChangeSecretModal({
     <Modal show={show} size="lg" fullscreen="sm-down">
       <Modal.Header>Change Secret</Modal.Header>
       <Modal.Body>
-        <Form>
+        <Form onSubmit={(e) => e.preventDefault()}>
           <Form.Group className="mb-3">
             <Form.Label>Enter your password</Form.Label>
             <Form.Control
