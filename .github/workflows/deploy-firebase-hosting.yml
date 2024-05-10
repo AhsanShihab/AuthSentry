@@ -5,14 +5,18 @@ on:
     branches: [master]
 
 jobs:
-  firebase_hosting_deployment:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: npm ci && npm run build
+      - run: |
+          export REACT_APP_FIREBASE_API_KEY=${{ vars.REACT_APP_FIREBASE_API_KEY }}
+          export REACT_APP_FIREBASE_REALTIME_DATABASE_URL=${{ vars.REACT_APP_FIREBASE_REALTIME_DATABASE_URL }}
+          npm ci
+          npm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_AUTHSENTRY }}'
           channelId: live
-          projectId: ${{ github.env.FIREBASE_PROJECT_ID }}  
+          projectId: ${{ vars.FIREBASE_PROJECT_ID }}  

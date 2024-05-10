@@ -14,7 +14,7 @@ concurrency:
     cancel-in-progress: false
 
 jobs:
-    deploy:
+    build-and-deploy:
         environment:
             name: github-pages
             url: ${{ steps.deployment.outputs.page_url }}
@@ -24,6 +24,8 @@ jobs:
         - name: build
           run: |
             node .github/scripts/update-homepage-url.js ${{ github.repository_owner }}
+            export REACT_APP_FIREBASE_API_KEY=${{ vars.REACT_APP_FIREBASE_API_KEY }}
+            export REACT_APP_FIREBASE_REALTIME_DATABASE_URL=${{ vars.REACT_APP_FIREBASE_REALTIME_DATABASE_URL }}
             npm ci
             npm run build
         - uses: actions/configure-pages@v5
