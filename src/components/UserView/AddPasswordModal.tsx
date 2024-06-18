@@ -36,6 +36,7 @@ function AddPasswordModal({
   const [password, setPassword] = useState(
     generateRandomPassword(passwordLength)
   );
+  const [includeSpecialChars, setIncludeSpecialChars] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleNote = (value: string) => {
@@ -45,8 +46,8 @@ function AddPasswordModal({
   };
 
   useEffect(() => {
-    setPassword(generateRandomPassword(passwordLength));
-  }, [passwordLength]);
+    setPassword(generateRandomPassword(passwordLength, includeSpecialChars));
+  }, [passwordLength, includeSpecialChars]);
 
   const changePasswordLength = (percent: string) => {
     const percentNumber = Number.parseInt(percent);
@@ -272,6 +273,14 @@ function AddPasswordModal({
                     <Form.Text className="text-muted">
                       Length of the randomly generated password:{" "}
                       {passwordLength}
+                      <Form.Check
+                        type="checkbox"
+                        label="Include Special Characters"
+                        checked={includeSpecialChars}
+                        onChange={(e) => {
+                          setIncludeSpecialChars(e.target.checked);
+                        }}
+                      />
                       <Form.Range
                         min="8"
                         max="256"
