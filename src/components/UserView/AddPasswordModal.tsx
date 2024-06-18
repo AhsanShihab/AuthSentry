@@ -13,6 +13,7 @@ import { generateRandomPassword } from "../../services/password_generator";
 import * as vaultService from "../../services/vault";
 import { NOTE_CHARACTER_LIMIT } from "../../constants";
 import { InvalidEncryptorError } from "../../services/encryption";
+import { Spinner } from "react-bootstrap";
 
 function AddPasswordModal({
   isOpen,
@@ -35,6 +36,7 @@ function AddPasswordModal({
   const [password, setPassword] = useState(
     generateRandomPassword(passwordLength)
   );
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleNote = (value: string) => {
     if (value.length <= NOTE_CHARACTER_LIMIT) {
@@ -69,6 +71,7 @@ function AddPasswordModal({
   };
 
   const handleAdd = async () => {
+    setIsLoading(true);
     try {
       const submitData: IVaultItemAddData = {
         type,
@@ -103,6 +106,8 @@ function AddPasswordModal({
       } else {
         throw err;
       }
+    } finally {
+      setIsLoading(false);
     }
   };
   const isReadyToAdd =
@@ -284,10 +289,16 @@ function AddPasswordModal({
       <Modal.Footer>
         <Button
           variant="outline-secondary"
-          disabled={!isReadyToAdd}
+          disabled={!isReadyToAdd || isLoading}
           onClick={handleAdd}
         >
-          Add
+          {isLoading ? (
+            <Spinner animation="border" size="sm" role="status">
+              <span className="visually-hidden">Adding New Entry ...</span>
+            </Spinner>
+          ) : (
+            "Add"
+          )}
         </Button>
       </Modal.Footer>
     </Modal>
