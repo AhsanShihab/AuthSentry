@@ -5,6 +5,7 @@ import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
+import Spinner from "react-bootstrap/Spinner";
 import { CheckIcon, CopyButtonIcon } from "../Common/Icons";
 import { useVault } from "../../contexts/vault/provider";
 import { DataType, IVaultItemAddData } from "../../contexts/vault/types";
@@ -13,7 +14,6 @@ import { generateRandomPassword } from "../../services/password_generator";
 import * as vaultService from "../../services/vault";
 import { NOTE_CHARACTER_LIMIT } from "../../constants";
 import { InvalidEncryptorError } from "../../services/encryption";
-import { Spinner } from "react-bootstrap";
 
 function AddPasswordModal({
   isOpen,
@@ -303,7 +303,7 @@ function AddPasswordModal({
         >
           {isLoading ? (
             <Spinner animation="border" size="sm" role="status">
-              <span className="visually-hidden">Adding New Entry ...</span>
+              <span className="visually-hidden">Adding New Entry</span>
             </Spinner>
           ) : (
             "Add"

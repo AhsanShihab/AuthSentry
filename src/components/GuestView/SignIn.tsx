@@ -98,7 +98,7 @@ function SignIn({
       >
         {isProcessingSignIn ? (
           <Spinner animation="border" size="sm" role="status">
-            <span className="visually-hidden">Signing in ...</span>
+            <span className="visually-hidden">Signing in</span>
           </Spinner>
         ) : (
           <>Sign In</>

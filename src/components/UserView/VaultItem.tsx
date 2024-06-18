@@ -3,6 +3,7 @@ import Accordion from "react-bootstrap/Accordion";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Badge from "react-bootstrap/Badge";
+import Spinner from "react-bootstrap/Spinner";
 import { generateRandomPassword } from "../../services/password_generator";
 import { deleteVaultItem, updateVaultItem } from "../../services/vault";
 import CopyButton from "../Common/CopyButton";
@@ -31,6 +32,7 @@ function VaultItem({ item }: { item: IVaultItemData }) {
   );
   const [showNote, setShowNote] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const changePasswordLength = (percent: string) => {
     const percentNumber = Number.parseInt(percent);
@@ -45,27 +47,34 @@ function VaultItem({ item }: { item: IVaultItemData }) {
   };
 
   const handleUpdate = async () => {
-    const docId = item.id;
-    const data: IVaultItemAddData = {
-      type,
-      name,
-      note,
-      siteUrl,
-      password,
-      email,
-      username,
-      passwordUpdatedAt:
-        password !== item.password ? Date.now() : item.passwordUpdatedAt,
-    };
-    await updateVaultItem(docId, data);
-    vaultDispatch({
-      type: VaultActionType.UPDATE_VAULT_ITEM,
-      payload: {
-        id: item.id,
-        update: data,
-      },
-    });
-    setIsReadOnly(true);
+    setIsUpdating(true);
+    try {
+      const docId = item.id;
+      const data: IVaultItemAddData = {
+        type,
+        name,
+        note,
+        siteUrl,
+        password,
+        email,
+        username,
+        passwordUpdatedAt:
+          password !== item.password ? Date.now() : item.passwordUpdatedAt,
+      };
+      await updateVaultItem(docId, data);
+      vaultDispatch({
+        type: VaultActionType.UPDATE_VAULT_ITEM,
+        payload: {
+          id: item.id,
+          update: data,
+        },
+      });
+      setIsReadOnly(true);
+    } catch {
+      alert("Update operation failed!");
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   const handleDelete = () => {
@@ -363,6 +372,7 @@ function VaultItem({ item }: { item: IVaultItemData }) {
             size="sm"
             variant="outline-secondary"
             onClick={() => setIsReadOnly(!isReadOnly)}
+            disabled={isUpdating}
           >
             {isReadOnly ? "Edit" : "Cancel"}
           </Button>
@@ -371,9 +381,17 @@ function VaultItem({ item }: { item: IVaultItemData }) {
             size="sm"
             variant="outline-secondary"
             onClick={isReadOnly ? handleDelete : handleUpdate}
-            disabled={!isReadOnly && !isReadyToUpdate}
+            disabled={isUpdating || (!isReadOnly && !isReadyToUpdate)}
           >
-            {isReadOnly ? "Delete" : "Update"}
+            {isUpdating ? (
+              <Spinner animation="border" size="sm" role="status">
+                <span className="visually-hidden">Updating</span>
+              </Spinner>
+            ) : isReadOnly ? (
+              "Delete"
+            ) : (
+              "Update"
+            )}
           </Button>
         </div>
       </Accordion.Body>

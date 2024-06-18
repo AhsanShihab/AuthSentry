@@ -131,7 +131,7 @@ function SignUp({
       >
         {isProcessingSignUp ? (
           <Spinner animation="border" size="sm" role="status">
-            <span className="visually-hidden">Signing up ...</span>
+            <span className="visually-hidden">Signing up</span>
           </Spinner>
         ) : (
           <>Sign Up</>
