@@ -5,7 +5,7 @@ import Spinner from "react-bootstrap/Spinner";
 import MasterPasswordRegistrationInput from "../Common/MasterPasswordRegistrationInput";
 import { register } from "../../services/authentication";
 import EncryptionSecretInput from "../Common/EncryptionSecretInput";
-import { Encryptor } from "../../services/encryption";
+import * as vaultService from "../../services/vault";
 
 function SignUp({
   email,
@@ -39,9 +39,9 @@ function SignUp({
     setSignUpErrorMsg("");
     try {
       await register(email, password);
-      const encryptor = new Encryptor(email, password);
+      const encryptor = await vaultService.getCurrentEncryptor();
       encryptor.secret = secret;
-      encryptor.saveSecret();
+      await encryptor.saveSecret();
       await onSignUp();
     } catch (err: any) {
       if (err.code === "auth/invalid-email") {

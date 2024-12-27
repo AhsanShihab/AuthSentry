@@ -73,7 +73,10 @@ export const updateMasterPassword = async (
     status: "ongoing",
   });
   const email = getCurrentUser()!.email!;
+  const currentEncryptor = await vault.getCurrentEncryptor();
+  await currentEncryptor.loadSecret();
   const newEncryptor = new Encryptor(email, newPassword);
+  newEncryptor.secret = currentEncryptor.secret;
   try {
     await vault.reEncryptData(newEncryptor);
     operationStatusCallback("previous", { status: "done" });
@@ -127,6 +130,7 @@ export const updateMasterPassword = async (
       .deleteBackup()
       .catch(() => console.log("cloud backup is not removed"));
     operationStatusCallback("new", { msg: "Done!", status: "done" });
+    await newEncryptor.saveSecret();
     return newEncryptor;
   }
 };
@@ -200,7 +204,7 @@ export const updateSecret = async (
     .deleteBackup()
     .catch(() => console.log("cloud backup is not removed"));
   operationStatusCallback("new", { msg: "Done!", status: "done" });
-  newEncryptor.saveSecret();
+  await newEncryptor.saveSecret();
   return newEncryptor;
 };
 

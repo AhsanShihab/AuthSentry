@@ -4,7 +4,7 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import EncryptionSecretInput from "../Common/EncryptionSecretInput";
 import { useAuth } from "../../contexts/auth/provider";
-import { Encryptor, InvalidEncryptorError } from "../../services/encryption";
+import { InvalidEncryptorError } from "../../services/encryption";
 import * as vaultService from "../../services/vault";
 import { useVault } from "../../contexts/vault/provider";
 import { VaultActionType } from "../../contexts/vault/enums";
@@ -41,8 +41,8 @@ function VaultLoader() {
       type: VaultActionType.START_LOADING_VAULT,
     });
     setShowSecretAskModal(false);
-    const user = auth.user!.userInfo;
-    const encryptor = new Encryptor(user.email, user.password);
+    const encryptor = await vaultService.getCurrentEncryptor();
+    await encryptor.loadSecret();
     if (!encryptor.secret && !secret) {
       // encryptor was unable to load the secret from locally saved value and have not asked the user the secret yet. open secret asking modal
       setSecretAskingMessage(
@@ -53,7 +53,7 @@ function VaultLoader() {
     } else if (secret) {
       // asked the user for a secret input, so let's use the latest secret
       encryptor.secret = secret;
-      encryptor.saveSecret();
+      await encryptor.saveSecret();
     }
 
     try {

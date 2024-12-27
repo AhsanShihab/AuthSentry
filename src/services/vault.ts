@@ -25,21 +25,22 @@ export const checkValidityOfEncryptionKey = async (
   }
 };
 
-const getCurrentEncryptor = async () => {
+export const getCurrentEncryptor = async () => {
   const user = firebase.getCurrentUser();
   if (!user) {
     throw Error("User not found!");
   }
   const encryptor = new Encryptor(user.email, user.password);
-  const isValidEncryptor = await checkValidityOfEncryptionKey(encryptor);
-  if (!isValidEncryptor) {
-    throw new InvalidEncryptorError();
-  }
+  await encryptor.loadSecret();
   return encryptor;
 };
 
 const decryptData = async (data: IVaultItemData): Promise<IVaultItemData> => {
   const encryptor = await getCurrentEncryptor();
+  const isValidEncryptor = await checkValidityOfEncryptionKey(encryptor);
+  if (!isValidEncryptor) {
+    throw new InvalidEncryptorError();
+  }
   const [note, email, password, username, siteUrl] = await Promise.all([
     data.note ? encryptor.decrypt(data.note) : Promise.resolve(""),
     data.email ? encryptor.decrypt(data.email) : Promise.resolve(""),
@@ -68,6 +69,12 @@ const encryptData = async (
   const encryptor = customEncryptor
     ? customEncryptor
     : await getCurrentEncryptor();
+  if (!customEncryptor) {
+    const isValidEncryptor = await checkValidityOfEncryptionKey(encryptor);
+    if (!isValidEncryptor) {
+      throw new InvalidEncryptorError();
+    }
+  }
   const [note, email, password, username, siteUrl] = await Promise.all([
     data.note ? encryptor.encrypt(data.note) : Promise.resolve(""),
     data.email ? encryptor.encrypt(data.email) : Promise.resolve(""),

@@ -17,13 +17,13 @@ function Main() {
       {!isInstalled && showInstallMessage && (
         <Alert
           className="d-block d-md-flex justify-content-center align-items-center gap-1 rounded-0"
-          variant="primary"
+          variant="info"
           dismissible
           onClose={() => setShowInstallMessage(false)}
         >
           You can install AuthSentry on your device for easier access.{" "}
           <Button variant="outline-secondary" onClick={install}>
-            Install App
+            Install Now
           </Button>
         </Alert>
       )}

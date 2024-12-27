@@ -4,7 +4,6 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
-import secureLocalStorage from "react-secure-storage";
 import { useAuth } from "../../contexts/auth/provider";
 import { AuthActionType } from "../../contexts/auth/enums";
 import { getCurrentUser } from "../../services/authentication";
@@ -23,7 +22,7 @@ function Authentication() {
     if (!user) {
       return;
     }
-    secureLocalStorage.setItem("last_logged_in_email", email);
+    localStorage.setItem("last_logged_in_email", email);
     authDispatch({
       type: AuthActionType.LOAD_USER,
       payload: {
@@ -41,7 +40,7 @@ function Authentication() {
   }
 
   useEffect(() => {
-    const value = secureLocalStorage.getItem("last_logged_in_email");
+    const value = localStorage.getItem("last_logged_in_email");
     if (value) {
       setEmail(value as string);
     }

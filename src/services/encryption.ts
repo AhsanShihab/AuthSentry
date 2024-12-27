@@ -1,5 +1,3 @@
-import secureLocalStorage from "react-secure-storage";
-
 function uint8ArrayToBase64(uint8Array: Uint8Array): string {
   const binaryString = String.fromCharCode.apply(null, Array.from(uint8Array));
   return btoa(binaryString);
@@ -22,9 +20,7 @@ export class Encryptor {
   constructor(email: string, password: string) {
     this.password = password;
     this.email = email;
-    this._secret = secureLocalStorage.getItem(
-      this.getStorageKeyForSecret()
-    ) as string;
+    this._secret = "";
   }
 
   get secret() {
@@ -35,8 +31,17 @@ export class Encryptor {
     this._secret = value;
   }
 
-  saveSecret() {
-    secureLocalStorage.setItem(this.getStorageKeyForSecret(), this._secret);
+  async saveSecret() {
+    const encryptedSecret = await this.encrypt(this._secret, false);
+    localStorage.setItem(this.getStorageKeyForSecret(), encryptedSecret);
+  }
+
+  async loadSecret() {
+    const encryptedSecretInLocalStorage = localStorage.getItem(
+      this.getStorageKeyForSecret()
+    );
+    if (!encryptedSecretInLocalStorage) return;
+    this._secret = await this.decrypt(encryptedSecretInLocalStorage, false);
   }
 
   hashValue = async (value: string): Promise<string> => {
@@ -60,15 +65,20 @@ export class Encryptor {
     }
   };
 
-  private getEncryptionKey = () => this.password + this._secret;
+  private getEncryptionKey = (withSecret: boolean = true) =>
+    this.password + (withSecret ? this._secret : "");
 
-  getEncryptionKeyHash = async () => this.hashValue(this.getEncryptionKey());
+  getEncryptionKeyHash = async (withSecret: boolean = true) =>
+    this.hashValue(this.getEncryptionKey(withSecret));
 
   getStorageKeyForSecret = () => `USER_SECRET_${this.email}`;
 
-  deriveKeyFromPassword = async (salt: Uint8Array) => {
+  deriveKeyFromPassword = async (
+    salt: Uint8Array,
+    withSecret: boolean = true
+  ) => {
     const encoder = new TextEncoder();
-    const passwordData = encoder.encode(this.getEncryptionKey());
+    const passwordData = encoder.encode(this.getEncryptionKey(withSecret));
 
     const keyMaterial = await crypto.subtle.importKey(
       "raw",
@@ -92,10 +102,10 @@ export class Encryptor {
     return new Uint8Array(keyBytes);
   };
 
-  encrypt = async (value: string) => {
+  encrypt = async (value: string, withSecret: boolean = true) => {
     const encoder = new TextEncoder();
     const salt = crypto.getRandomValues(new Uint8Array(16));
-    const keyBytes = await this.deriveKeyFromPassword(salt);
+    const keyBytes = await this.deriveKeyFromPassword(salt, withSecret);
     const key = await crypto.subtle.importKey(
       "raw",
       keyBytes,
@@ -118,9 +128,12 @@ export class Encryptor {
 
     return `${saltString}:${ivString}:${encryptedDataString}`;
   };
-  decrypt = async (value: string) => {
+  decrypt = async (value: string, withSecret: boolean = true) => {
     const [salt, iv, encryptedData] = value.split(":");
-    const keyBytes = await this.deriveKeyFromPassword(base64ToUint8Array(salt));
+    const keyBytes = await this.deriveKeyFromPassword(
+      base64ToUint8Array(salt),
+      withSecret
+    );
     const key = await crypto.subtle.importKey(
       "raw",
       keyBytes,
